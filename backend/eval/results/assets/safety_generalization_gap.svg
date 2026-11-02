@@ -1,0 +1,36 @@
+<svg width="750" height="450" version="1.1" viewBox="0 0 750 450" xmlns:xlink="" xmlns="">
+<rect width="750" height="450" x="0" y="0" fill="none"></rect>
+<path d="M75 380.5L675 380.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 316.5L675 316.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 252.5L675 252.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 188.5L675 188.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 124.5L675 124.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 60.5L675 60.5" fill="transparent" stroke="#E0E6F1" class="zr0-cls-0"></path>
+<path d="M75 380.5L675 380.5" fill="transparent" stroke="#6E7079" stroke-linecap="round" class="zr0-cls-0"></path>
+<path d="M75.5 380L75.5 385" fill="transparent" stroke="#6E7079" class="zr0-cls-0"></path>
+<path d="M375.5 380L375.5 385" fill="transparent" stroke="#6E7079" class="zr0-cls-0"></path>
+<path d="M675.5 380L675.5 385" fill="transparent" stroke="#6E7079" class="zr0-cls-0"></path>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 380)" fill="#6E7079">0%</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 316)" fill="#6E7079">20%</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 252)" fill="#6E7079">40%</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 188)" fill="#6E7079">60%</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 124)" fill="#6E7079">80%</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(67 60)" fill="#6E7079">100%</text>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="6" transform="translate(225 388)" fill="#6E7079">Combined (Dev Set)</text>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="6" transform="translate(525 388)" fill="#6E7079">Fresh (Challenge Set)</text>
+<path d="M115.5 380l99.5 0l0 -318.1l-99.5 0Z" fill="#5470c6" class="zr0-cls-1 zr0-cls-2"></path>
+<path d="M415.5 380l99.5 0l0 -130.2l-99.5 0Z" fill="#5470c6" class="zr0-cls-3 zr0-cls-2"></path>
+<path d="M235 380l99.5 0l0 -4.5l-99.5 0Z" fill="#91cc75" class="zr0-cls-4 zr0-cls-5"></path>
+<path d="M535 380l99.5 0l0 -276.5l-99.5 0Z" fill="#91cc75" class="zr0-cls-6 zr0-cls-5"></path>
+<path d="M-5 -5l335.8 0l0 24l-335.8 0Z" transform="translate(212.08 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0" class="zr0-cls-0"></path>
+<path d="M3.5 0L21.5 0A3.5 3.5 0 0 1 25 3.5L25 10.5A3.5 3.5 0 0 1 21.5 14L3.5 14A3.5 3.5 0 0 1 0 10.5L0 3.5A3.5 3.5 0 0 1 3.5 0" transform="translate(212.08 5)" fill="#5470c6" class="zr0-cls-0"></path>
+<text text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(212.08 5)" fill="#333">Overall Accuracy</text>
+<path d="M0 0l120.8 0l0 14l-120.8 0Z" transform="translate(212.08 5)" fill="transparent" class="zr0-cls-7"></path>
+<path d="M3.5 0L21.5 0A3.5 3.5 0 0 1 25 3.5L25 10.5A3.5 3.5 0 0 1 21.5 14L3.5 14A3.5 3.5 0 0 1 0 10.5L0 3.5A3.5 3.5 0 0 1 3.5 0" transform="translate(342.92 5)" fill="#91cc75" class="zr0-cls-0"></path>
+<text text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(342.92 5)" fill="#333">High-Risk False-Negative Rate</text>
+<path d="M0 0l195 0l0 14l-195 0Z" transform="translate(342.92 5)" fill="transparent" class="zr0-cls-7"></path>
+<path d="M-5 -5l429.4 0l0 50l-429.4 0Z" transform="translate(5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0" class="zr0-cls-0"></path>
+<text text-anchor="start" style="font-size:18px;font-family:sans-serif;font-weight:bold;" xml:space="preserve" y="9" transform="translate(5 5)" fill="#464646">Safety Gate Generalization Gap</text>
+<text text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="34" transform="translate(5 5)" fill="#6E7079">In-sample Regex v2 (174 cases) vs Out-of-sample Fresh Challenge (59 cases)</text>
+
+</svg>

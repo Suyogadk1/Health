@@ -1,0 +1,5 @@
+scenario,tier_reached,final_provider,attempts
+nominal,1,Gemini 1 (Primary),"Gemini 1 (Primary)"
+gemini1-down,2,Gemini 2 (Secondary),"Gemini 1 (Primary) -> Gemini 2 (Secondary)"
+gemini-both-down,3,Grok (xAI),"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI)"
+all-external-down,4,Mindful Local,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI) -> Mindful Local (Fallback)"

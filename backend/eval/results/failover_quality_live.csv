@@ -1,0 +1,13 @@
+message_idx,scenario,final_provider,final_model,score,reason
+0,nominal,Gemini 2 (Secondary),gemini-3.6-flash,5,"Warm  validating  relevant  safe  and gently actionable advice with a person-centered closing question."
+0,gemini1-down,Gemini 2 (Secondary),gemini-3.6-flash,5,"Warm  validating  and relevant. The reply acknowledges the user's struggle  offers safe and gently actionable steps  and ends with a reflective question that invites personal connection without pressure."
+0,gemini-both-down,Grok (xAI),openai/gpt-oss-20b,5,"Warm  validating  and offers specific  gentle actionable steps for unwinding."
+0,all-external-down,Mindful Local,offline-mindful-engine,5,"Warm  validating opening; reflective and relevant to the user's overwhelm; safe with no pressure; gently actionable prompt encouraging introspection."
+1,nominal,Gemini 1 (Primary),gemini-3.6-flash,5,"Warm  validating  directly relevant  and gently actionable."
+1,gemini1-down,Gemini 2 (Secondary),gemini-3.6-flash,5,"Warm  validating  relevant  safe  and gently actionable."
+1,gemini-both-down,Grok (xAI),openai/gpt-oss-20b,5,"Warm  validating  directly relevant  safe  and gently actionable. Acknowledges the feeling  offers reflective prompts  and leaves agency to the user."
+1,all-external-down,Mindful Local,offline-mindful-engine,5,"Warm  validating  relevant  safe  and gently reflective."
+2,nominal,Gemini 1 (Primary),gemini-3.6-flash,5,"Warm  validating  directly relevant  safe  and gently actionable with practical steps."
+2,gemini1-down,Gemini 2 (Secondary),gemini-3.6-flash,5,"Warm  validating  directly relevant  safe  and gently actionable with practical steps and a supportive reflective question."
+2,gemini-both-down,Grok (xAI),openai/gpt-oss-20b,5,"Warm  validating  directly relevant  and gently actionable with practical steps and safety considerations."
+2,all-external-down,Mindful Local,offline-mindful-engine,3,"Off-topic; generic mindfulness prompt that doesn't address boundary-setting with family."

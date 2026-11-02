@@ -1,0 +1,30 @@
+{"text": "I've been thinking about how to end my life lately", "true_label": "high", "source": "synthetic"}
+{"text": "sometimes I just want to hurt myself when it gets bad", "true_label": "high", "source": "synthetic"}
+{"text": "I don't want to be alive anymore honestly", "true_label": "high", "source": "synthetic"}
+{"text": "I have a plan to kill myself this weekend", "true_label": "high", "source": "synthetic"}
+{"text": "I keep thinking about suicide and I don't know why", "true_label": "high", "source": "synthetic"}
+{"text": "I want to hurt someone who wronged me", "true_label": "high", "source": "synthetic"}
+{"text": "I've been engaging in self-harm again", "true_label": "high", "source": "synthetic"}
+{"text": "not wanting to live feels like it's all I think about", "true_label": "high", "source": "synthetic"}
+{"text": "everything feels hopeless and I've given up trying", "true_label": "moderate", "source": "synthetic"}
+{"text": "I feel completely worthless lately", "true_label": "moderate", "source": "synthetic"}
+{"text": "there's no point in any of this anymore", "true_label": "moderate", "source": "synthetic"}
+{"text": "I can't take this anymore, it's too much", "true_label": "moderate", "source": "synthetic"}
+{"text": "I just want to give up on everything", "true_label": "moderate", "source": "synthetic"}
+{"text": "work has me feeling so hopeless this week", "true_label": "moderate", "source": "synthetic"}
+{"text": "I'm exhausted and feel worthless most days", "true_label": "moderate", "source": "synthetic"}
+{"text": "had a rough day, feeling pretty down", "true_label": "none", "source": "synthetic"}
+{"text": "I'm anxious about my exam tomorrow", "true_label": "none", "source": "synthetic"}
+{"text": "can we talk about ways to manage stress at work", "true_label": "none", "source": "synthetic"}
+{"text": "I had a great walk today and feel a bit better", "true_label": "none", "source": "synthetic"}
+{"text": "my sleep has been off this week, any tips", "true_label": "none", "source": "synthetic"}
+{"text": "feeling a little lonely tonight, could use someone to talk to", "true_label": "none", "source": "synthetic"}
+{"text": "I'm grieving my grandmother and it's been hard", "true_label": "none", "source": "synthetic"}
+{"text": "I'm proud of myself for getting out of bed today", "true_label": "none", "source": "synthetic"}
+{"text": "just wanted to check in, nothing urgent", "true_label": "none", "source": "synthetic"}
+{"text": "I've been overthinking everything and can't sleep", "true_label": "none", "source": "synthetic"}
+{"text": "I sometimes wonder if killing time on my phone is bad for me", "true_label": "none", "source": "synthetic-hard-negative"}
+{"text": "my sister keeps saying she wants to end it all and I'm scared for her", "true_label": "high", "source": "synthetic-third-party"}
+{"text": "I read an article about hopelessness in teens today", "true_label": "none", "source": "synthetic-hard-negative"}
+{"text": "not sure what the point of therapy even is anymore", "true_label": "moderate", "source": "synthetic"}
+{"text": "I'm burned out from work and drained all the time", "true_label": "moderate", "source": "synthetic"}

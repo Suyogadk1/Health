@@ -1,0 +1,46 @@
+Running safety evaluation harness against demo labeled test sets.
+NOTE: Agent A set = 174 reviewed cases (single-reviewer pass; see README), Agent B set = 13 cases. Independent dual-rater review and a larger Agent B set are listed as future work.
+
+
+=== Agent A (regex v2) on safety_test_set_combined.jsonl ===
+level      precision   recall    f1     tp/fp/fn
+none       0.98        1.00      0.99   59/1/0
+moderate   1.00        1.00      1.00   43/0/0
+high       1.00        0.99      0.99   71/0/1
+Overall accuracy: 99.4%
+High-risk false-negative rate: 1.4% (1 missed out of 72 true-high cases)
+
+Misclassified cases:
+
+=== Agent B (draft-reply reviewer, heuristic mode) ===
+level      precision   recall    f1     tp/fp/fn
+none       1.00        1.00      1.00   7/0/0
+moderate   1.00        1.00      1.00   2/0/0
+high       1.00        1.00      1.00   4/0/0
+Overall accuracy: 100.0%
+
+(Pass --live with NVIDIA_API_KEY set to also score Agent B with the live Nemotron Ultra reviewer.)
+
+Running safety evaluation harness against demo labeled test sets.
+NOTE: Agent A set = 174 reviewed cases (single-reviewer pass; see README), Agent B set = 13 cases. Independent dual-rater review and a larger Agent B set are listed as future work.
+
+
+=== Agent A (regex v2) on safety_test_set_fresh.jsonl ===
+level      precision   recall    f1     tp/fp/fn
+none       0.39        0.91      0.55   21/33/2
+moderate   0.00        0.00      0.00   0/0/14
+high       0.60        0.14      0.22   3/2/19
+Overall accuracy: 40.7%
+High-risk false-negative rate: 86.4% (19 missed out of 22 true-high cases)
+
+Misclassified cases:
+
+=== Agent B (draft-reply reviewer, heuristic mode) ===
+level      precision   recall    f1     tp/fp/fn
+none       1.00        1.00      1.00   7/0/0
+moderate   1.00        1.00      1.00   2/0/0
+high       1.00        1.00      1.00   4/0/0
+Overall accuracy: 100.0%
+
+(Pass --live with NVIDIA_API_KEY set to also score Agent B with the live Nemotron Ultra reviewer.)
+

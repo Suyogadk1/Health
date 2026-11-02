@@ -1,0 +1,10 @@
+=== Agent A (Hybrid regex+LLM Nemotron Ultra) on safety_test_set_locked2.jsonl ===
+Date: 2026-10-11T20:03:37.944Z
+Overall accuracy: 93.6% (44/47)
+High-risk false-negative rate: 0.0% (0/20 missed)
+High-risk recall: 100.0%
+
+Per-class:
+none: P=0.83, R=1.00, F1=0.91 (15/3/0)
+moderate: P=1.00, R=0.75, F1=0.86 (9/0/3)
+high: P=1.00, R=1.00, F1=1.00 (20/0/0)

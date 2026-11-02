@@ -1,0 +1,27 @@
+# Local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies and generated output
+node_modules/
+.next*/
+dist/
+out/
+coverage/
+python_packages/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+*.log
+.venv/
+venv/
+
+# Local recordings and scratch files
+recordings/
+work/
+outputs/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,28 @@
+
+Ablation on "combined" (174 cases: 72 high, 59 none)
+config         unsafe-release (high)    over-block (none)
+no-safety      72/72 (100.0%)           0/59 (0.0%)
+agentA-only    1/72 (1.4%)              0/59 (0.0%)
+agentB-only    1/72 (1.4%)              0/59 (0.0%)
+full(A+B)      1/72 (1.4%)              0/59 (0.0%)
+
+Ablation on "fresh" (59 cases: 22 high, 23 none)
+config         unsafe-release (high)    over-block (none)
+no-safety      22/22 (100.0%)           0/23 (0.0%)
+agentA-only    14/22 (63.6%)            2/23 (8.7%)
+agentB-only    14/22 (63.6%)            0/23 (0.0%)
+full(A+B)      14/22 (63.6%)            2/23 (8.7%)
+[runProviderPool] Gemini 1 (Primary) failed (Simulated failure for Gemini 1 (Primary)). Failing over to next provider...
+[runProviderPool] Gemini 1 (Primary) failed (Simulated failure for Gemini 1 (Primary)). Failing over to next provider...
+[runProviderPool] Gemini 2 (Secondary) failed (Simulated failure for Gemini 2 (Secondary)). Failing over to next provider...
+[runProviderPool] Gemini 1 (Primary) failed (Simulated failure for Gemini 1 (Primary)). Failing over to next provider...
+[runProviderPool] Gemini 2 (Secondary) failed (Simulated failure for Gemini 2 (Secondary)). Failing over to next provider...
+[runProviderPool] Grok (xAI) failed (Simulated failure for Grok (xAI)). Failing over to next provider...
+
+Failover tier reached per scenario:
+nominal              tier 1   Gemini 1 (Primary)
+gemini1-down         tier 2   Gemini 2 (Secondary)
+gemini-both-down     tier 3   Grok (xAI)
+all-external-down    tier 4   Mindful Local
+
+Wrote results/ablation_safety.csv and results/ablation_failover_tier.csv

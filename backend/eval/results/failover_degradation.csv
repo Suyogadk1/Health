@@ -1,0 +1,13 @@
+sample_message_idx,scenario,description,final_provider,final_model,attempts,latency_ms
+0,nominal,"All providers healthy, Gemini-1 handles the request",Gemini 1 (Primary),gemini-3.6-flash,"Gemini 1 (Primary)",431
+0,gemini1-down,"Primary Gemini fails, falls over to Gemini-2",Gemini 2 (Secondary),gemini-3.6-flash,"Gemini 1 (Primary) -> Gemini 2 (Secondary)",566
+0,gemini-both-down,"Both Gemini providers fail, falls over to Grok",Grok (xAI),openai/gpt-oss-20b,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI)",568
+0,all-external-down,"All three external providers fail, drops to local MindfulProvider",Mindful Local,offline-mindful-engine,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI) -> Mindful Local (Fallback)",469
+1,nominal,"All providers healthy, Gemini-1 handles the request",Gemini 1 (Primary),gemini-3.6-flash,"Gemini 1 (Primary)",429
+1,gemini1-down,"Primary Gemini fails, falls over to Gemini-2",Gemini 2 (Secondary),gemini-3.6-flash,"Gemini 1 (Primary) -> Gemini 2 (Secondary)",567
+1,gemini-both-down,"Both Gemini providers fail, falls over to Grok",Grok (xAI),openai/gpt-oss-20b,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI)",583
+1,all-external-down,"All three external providers fail, drops to local MindfulProvider",Mindful Local,offline-mindful-engine,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI) -> Mindful Local (Fallback)",453
+2,nominal,"All providers healthy, Gemini-1 handles the request",Gemini 1 (Primary),gemini-3.6-flash,"Gemini 1 (Primary)",432
+2,gemini1-down,"Primary Gemini fails, falls over to Gemini-2",Gemini 2 (Secondary),gemini-3.6-flash,"Gemini 1 (Primary) -> Gemini 2 (Secondary)",581
+2,gemini-both-down,"Both Gemini providers fail, falls over to Grok",Grok (xAI),openai/gpt-oss-20b,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI)",569
+2,all-external-down,"All three external providers fail, drops to local MindfulProvider",Mindful Local,offline-mindful-engine,"Gemini 1 (Primary) -> Gemini 2 (Secondary) -> Grok (xAI) -> Mindful Local (Fallback)",481

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindCare - Evaluation Metrics, Charts & Tables</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 2rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-blue {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-rose {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--accent-rose);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .badge-amber {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin: 0.75rem 0 0.5rem;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.lead {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 800px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-label {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0.25rem 0;
+    }
+
+    .stat-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.25rem;
+      background: var(--accent-blue);
+      border-radius: 2px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .code-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: #38bdf8;
+    }
+
+    .callout {
+      background: rgba(244, 63, 94, 0.08);
+      border-left: 4px solid var(--accent-rose);
+      padding: 1rem 1.25rem;
+      border-radius: 0 0.75rem 0.75rem 0;
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: #fda4af;
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <span class="badge badge-blue">Evaluation Suite Results</span>
+      <h1>MindCare Companion Benchmarks</h1>
+      <p class="lead">Empirical evaluation metrics, generalization gap analysis, component ablation, and multi-provider
+        failover latency measurements.</p>
+    </header>
+
+    <!-- Top Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">In-Sample Accuracy</div>
+        <div class="stat-value" style="color: var(--accent-green)">99.4%</div>
+        <div class="stat-sub">173/174 cases (Combined Dev set)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Out-of-Sample Gap</div>
+        <div class="stat-value" style="color: var(--accent-rose)">40.7%</div>
+        <div class="stat-sub">Fresh challenge set (86.4% high miss)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Agent B Review Accuracy</div>
+        <div class="stat-value" style="color: var(--accent-blue)">100%</div>
+        <div class="stat-sub">13/13 draft evaluations passing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Nominal Latency</div>
+        <div class="stat-value" style="color: var(--accent-amber)">431 ms</div>
+        <div class="stat-sub">Tier 1 Gemini 1 Primary response</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Safety Generalization -->
+    <h2 class="section-title">1. Safety Gate Generalization (Agent A)</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Generalization Gap Comparison</div>
+          <div class="card-desc">Accuracy & High-Risk False Negative Rate (Miss Rate)</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="generalizationChart"></canvas>
+        </div>
+        <div class="callout">
+          <div class="callout-title">Key Academic Finding</div>
+          Handwritten regexes achieve 99.4% on the development corpus but fail on 86.4% of out-of-sample high-risk
+          phrasing. This empirically justifies the hybrid LLM safety architecture (<code>assessRiskHybrid</code>).
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Class-Wise F1-Score Breakdown</div>
+          <div class="card-desc">F1 harmonic mean per risk category across sets</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="f1Chart"></canvas>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Risk Level</th>
+              <th>Dev Recall</th>
+              <th>Dev F1</th>
+              <th>Fresh Recall</th>
+              <th>Fresh F1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>None</strong></td>
+              <td>1.00</td>
+              <td>0.99</td>
+              <td>0.91</td>
+              <td>0.55</td>
+            </tr>
+            <tr>
+              <td><strong>Moderate</strong></td>
+              <td>1.00</td>
+              <td>1.00</td>
+              <td>0.00</td>
+              <td>0.00</td>
+            </tr>
+            <tr>
+              <td><strong>High</strong></td>
+              <td>0.99</td>
+              <td>0.99</td>
+              <td>0.14</td>
+              <td>0.22</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 2: Safety Ablation -->
+    <h2 class="section-title">2. Safety Layer Ablation Study</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Unsafe Release Rate on High-Risk Inputs</div>
+          <div class="card-desc">Tested against adversarial dismissive drafts</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="ablationChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Ablation Configuration Matrix</div>
+          <div class="card-desc">Component breakdown and over-block measurements</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Configuration</th>
+              <th>Dev Unsafe %</th>
+              <th>Fresh Unsafe %</th>
+              <th>Over-block %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="code-pill">no-safety</span></td>
+              <td>100.0%</td>
+              <td>100.0%</td>
+              <td>0.0%</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">agentA-only</span></td>
+              <td>1.4%</td>
+              <td>86.4%</td>
+              <td>8.7%</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">agentB-only</span></td>
+              <td>1.4%</td>
+              <td>86.4%</td>
+              <td>0.0%</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">full(A+B)</span></td>
+              <td>1.4%</td>
+              <td>86.4%</td>
+              <td>8.7%</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+          Note: In heuristic mode, Agent B mirrors Agent A's rule checker. They become truly complementary when Agent B
+          uses a dedicated LLM reviewer (Nemotron Ultra).
+        </p>
+      </div>
+    </div>
+
+    <!-- Section 3: Failover Latency -->
+    <h2 class="section-title">3. Multi-Provider Failover Resilience</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Response Latency by Failover Tier</div>
+          <div class="card-desc">Latency overhead across 4 simulated outage scenarios</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="latencyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Failover Routing Pipeline</div>
+          <div class="card-desc">Cascade details and final fallback safety</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Active Provider</th>
+              <th>Latency</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Tier 1</strong></td>
+              <td>Gemini 1 (Primary)</td>
+              <td>431 ms</td>
+              <td><span class="badge badge-green">Healthy</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tier 2</strong></td>
+              <td>Gemini 2 (Secondary)</td>
+              <td>561 ms</td>
+              <td><span class="badge badge-amber">+130ms failover</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tier 3</strong></td>
+              <td>Grok (xAI)</td>
+              <td>571 ms</td>
+              <td><span class="badge badge-amber">+140ms failover</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tier 4</strong></td>
+              <td>Mindful Local (Rule-Engine)</td>
+              <td>468 ms</td>
+              <td><span class="badge badge-blue">Offline Safe</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout" style="background: rgba(52, 211, 153, 0.08); border-color: var(--accent-green);">
+          <div class="callout-title" style="color: #6ee7b7;">Zero-Downtime Guarantee</div>
+          Even under complete external cloud outages, the offline local provider activates within 468 ms, preventing
+          service disconnection.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chartDefaults = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#94a3b8', font: { family: "'Plus Jakarta Sans'" } } }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#94a3b8', font: { family: "'Plus Jakarta Sans'" } },
+          grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        },
+        y: {
+          ticks: { color: '#94a3b8', font: { family: "'Plus Jakarta Sans'" } },
+          grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        }
+      }
+    };
+
+    // Chart 1: Generalization Gap
+    new Chart(document.getElementById('generalizationChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Combined Dev Set (174)', 'Fresh Challenge Set (59)'],
+        datasets: [
+          {
+            label: 'Overall Accuracy (%)',
+            data: [99.4, 40.7],
+            backgroundColor: '#38bdf8',
+            borderRadius: 6
+          },
+          {
+            label: 'High-Risk Miss Rate (%)',
+            data: [1.4, 86.4],
+            backgroundColor: '#f43f5e',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        scales: {
+          ...chartDefaults.scales,
+          y: { ...chartDefaults.scales.y, max: 100 }
+        }
+      }
+    });
+
+    // Chart 2: F1 Breakdown
+    new Chart(document.getElementById('f1Chart'), {
+      type: 'bar',
+      data: {
+        labels: ['None', 'Moderate', 'High Risk'],
+        datasets: [
+          {
+            label: 'Combined Dev Set F1',
+            data: [0.99, 1.00, 0.99],
+            backgroundColor: '#34d399',
+            borderRadius: 6
+          },
+          {
+            label: 'Fresh Challenge Set F1',
+            data: [0.55, 0.00, 0.22],
+            backgroundColor: '#fb7185',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        scales: {
+          ...chartDefaults.scales,
+          y: { ...chartDefaults.scales.y, max: 1.0 }
+        }
+      }
+    });
+
+    // Chart 3: Ablation
+    new Chart(document.getElementById('ablationChart'), {
+      type: 'bar',
+      data: {
+        labels: ['No Safety', 'Agent A Only', 'Agent B Only', 'Full (A+B)'],
+        datasets: [
+          {
+            label: 'Combined Set Unsafe %',
+            data: [100.0, 1.4, 1.4, 1.4],
+            backgroundColor: '#60a5fa',
+            borderRadius: 6
+          },
+          {
+            label: 'Fresh Set Unsafe %',
+            data: [100.0, 86.4, 86.4, 86.4],
+            backgroundColor: '#fbbf24',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        scales: {
+          ...chartDefaults.scales,
+          y: { ...chartDefaults.scales.y, max: 100 }
+        }
+      }
+    });
+
+    // Chart 4: Latency
+    new Chart(document.getElementById('latencyChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Tier 1 (Nominal)', 'Tier 2 (Gemini-2)', 'Tier 3 (Grok)', 'Tier 4 (Offline)'],
+        datasets: [
+          {
+            label: 'Latency (ms)',
+            data: [431, 561, 571, 468],
+            backgroundColor: ['#34d399', '#38bdf8', '#fbbf24', '#a855f7'],
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        scales: {
+          ...chartDefaults.scales,
+          y: { ...chartDefaults.scales.y, title: { display: true, text: 'Milliseconds (ms)', color: '#94a3b8' } }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

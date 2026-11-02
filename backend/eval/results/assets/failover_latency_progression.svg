@@ -1,0 +1,40 @@
+<svg width="800" height="450" version="1.1" viewBox="0 0 800 450" xmlns:xlink="" xmlns="">
+<rect width="800" height="450" x="0" y="0" fill="none"></rect>
+<path d="M80 382.5L720 382.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 329.5L720 329.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 275.5L720 275.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 221.5L720 221.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 167.5L720 167.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 114.5L720 114.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<path d="M80 60.5L720 60.5" fill="transparent" stroke="#E0E6F1" class="zr3-cls-29"></path>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="-6" transform="translate(80 45)" fill="#6E7079">Latency (ms)</text>
+<path d="M80 382.5L720 382.5" fill="transparent" stroke="#6E7079" stroke-linecap="round" class="zr3-cls-29"></path>
+<path d="M80.5 382.5L80.5 387.5" fill="transparent" stroke="#6E7079" class="zr3-cls-29"></path>
+<path d="M240.5 382.5L240.5 387.5" fill="transparent" stroke="#6E7079" class="zr3-cls-29"></path>
+<path d="M400.5 382.5L400.5 387.5" fill="transparent" stroke="#6E7079" class="zr3-cls-29"></path>
+<path d="M560.5 382.5L560.5 387.5" fill="transparent" stroke="#6E7079" class="zr3-cls-29"></path>
+<path d="M720.5 382.5L720.5 387.5" fill="transparent" stroke="#6E7079" class="zr3-cls-29"></path>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 382.5)" fill="#6E7079">0 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 328.75)" fill="#6E7079">100 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 275)" fill="#6E7079">200 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 221.25)" fill="#6E7079">300 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 167.5)" fill="#6E7079">400 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 113.75)" fill="#6E7079">500 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(72 60)" fill="#6E7079">600 ms</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="matrix(0.966,-0.259,0.259,0.966,160,390.5)" fill="#6E7079">Tier 1: Nominal\n(Gemini 1)</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="matrix(0.966,-0.259,0.259,0.966,320,390.5)" fill="#6E7079">Tier 2: Gemini 1 Down\n(Gemini 2)</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="matrix(0.966,-0.259,0.259,0.966,480,390.5)" fill="#6E7079">Tier 3: Both Gemini Down\n(Grok)</text>
+<text text-anchor="end" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="matrix(0.966,-0.259,0.259,0.966,640,390.5)" fill="#6E7079">Tier 4: All External Down\n(Mindful Local)</text>
+<path d="M104.8 382.5l110.4 0l0 -231.7l-110.4 0Z" fill="#4CAF50" class="zr3-cls-30 zr3-cls-31"></path>
+<path d="M264.8 382.5l110.4 0l0 -301.5l-110.4 0Z" fill="#2196F3" class="zr3-cls-32 zr3-cls-33"></path>
+<path d="M424.8 382.5l110.4 0l0 -306.9l-110.4 0Z" fill="#FF9800" class="zr3-cls-34 zr3-cls-35"></path>
+<path d="M584.8 382.5l110.4 0l0 -251.5l-110.4 0Z" fill="#9C27B0" class="zr3-cls-36 zr3-cls-37"></path>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(160 266.6688)" fill="#333">431 ms</text>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(320 231.7313)" fill="#eee" stroke="#2196F3" stroke-width="2" paint-order="stroke" stroke-miterlimit="2">561 ms</text>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(480 229.0438)" fill="#333">571 ms</text>
+<text text-anchor="middle" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(640 256.725)" fill="#eee" stroke="#9C27B0" stroke-width="2" paint-order="stroke" stroke-miterlimit="2">468 ms</text>
+<path d="M-5 -5l359.9 0l0 50l-359.9 0Z" transform="translate(5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0" class="zr3-cls-29"></path>
+<text text-anchor="start" style="font-size:18px;font-family:sans-serif;font-weight:bold;" xml:space="preserve" y="9" transform="translate(5 5)" fill="#464646">Multi-Provider Failover Latency Progression</text>
+<text text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="34" transform="translate(5 5)" fill="#6E7079">Response latency (ms) across simulated failover tiers</text>
+
+</svg>

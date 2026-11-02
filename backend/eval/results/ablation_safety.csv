@@ -1,0 +1,9 @@
+set,config,high_cases,dismissive_released_on_high,unsafe_release_rate,none_cases,overblocked_on_none,overblock_rate
+combined,no-safety,72,72,1.0000,59,0,0.0000
+combined,agentA-only,72,1,0.0139,59,0,0.0000
+combined,agentB-only,72,1,0.0139,59,0,0.0000
+combined,full(A+B),72,1,0.0139,59,0,0.0000
+fresh,no-safety,22,22,1.0000,23,0,0.0000
+fresh,agentA-only,22,14,0.6364,23,2,0.0870
+fresh,agentB-only,22,14,0.6364,23,0,0.0000
+fresh,full(A+B),22,14,0.6364,23,2,0.0870
