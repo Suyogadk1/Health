@@ -291,7 +291,21 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
           </div>
         </div>
       ) : (
-        <VoiceControls muted={muted} onToggleMute={toggleMute} onEnd={endCall} />
+        <div className="flex flex-col items-center gap-3">
+          {state === "speaking" && !muted && (
+            <button
+              type="button"
+              onClick={() => {
+                serviceRef.current?.cancelSpeaking();
+                resumeListening();
+              }}
+              className="rounded-full border border-charcoal/15 bg-warm-white px-4 py-2 text-sm text-charcoal"
+            >
+              Stop reply and speak
+            </button>
+          )}
+          <VoiceControls muted={muted} onToggleMute={toggleMute} onEnd={endCall} />
+        </div>
       )}
 
       <p className="max-w-sm text-center text-[11px] text-soft-gray leading-relaxed">

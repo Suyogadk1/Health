@@ -198,13 +198,13 @@ export class RecordedVoiceInput {
         for (const value of samples) sum += value * value;
         const level = Math.sqrt(sum / samples.length);
         if (options.dictation) this.callbacks.onSignal?.(level > 0.002);
-        const active = level > (this.playback ? 0.025 : 0.003);
+        const active = level > (this.playback ? 0.008 : 0.003);
         const now = performance.now();
         if (wasPlayback && !this.playback && !heard) { started = now; chunks = []; }
         wasPlayback = this.playback;
         if (active) {
           voicedFrames++;
-          if (!heard && voicedFrames >= (this.playback ? 5 : 3)) {
+          if (!heard && voicedFrames >= 3) {
             heard = true;
             if (this.playback) { this.playback = false; this.onset?.(); }
           }
