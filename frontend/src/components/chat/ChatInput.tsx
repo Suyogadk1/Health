@@ -27,6 +27,7 @@ export function ChatInput({
     isSupported: speechSupported,
     isListening,
     isTranscribing,
+    micSignal,
     interimTranscript,
     error: speechError,
     startListening,
@@ -95,7 +96,7 @@ export function ChatInput({
             </span>
             <span className="font-medium">Listening to your voice…</span>
             <span className="text-[11px] text-rose-700/80 hidden sm:inline">
-              Speak at your own pace, then tap Stop to transcribe.
+              {micSignal ? "Microphone picking up sound" : "Waiting for microphone sound"}. Tap Stop to transcribe.
             </span>
           </div>
 

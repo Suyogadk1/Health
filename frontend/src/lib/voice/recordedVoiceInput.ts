@@ -1,5 +1,6 @@
 type Callbacks = {
   onReady: () => void;
+  onSignal?: (detected: boolean) => void;
   onSilence: () => void;
   onTranscript: (text: string) => void;
   onTranscribing: () => void;
@@ -185,7 +186,9 @@ export class RecordedVoiceInput {
         analyser.getFloatTimeDomainData(samples);
         let sum = 0;
         for (const value of samples) sum += value * value;
-        const active = Math.sqrt(sum / samples.length) > (this.playback ? 0.025 : 0.012);
+        const level = Math.sqrt(sum / samples.length);
+        if (options.dictation) this.callbacks.onSignal?.(level > 0.002);
+        const active = level > (this.playback ? 0.025 : 0.012);
         const now = performance.now();
         if (wasPlayback && !this.playback && !heard) { started = now; chunks = []; }
         wasPlayback = this.playback;

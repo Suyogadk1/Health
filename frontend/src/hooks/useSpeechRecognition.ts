@@ -7,6 +7,7 @@ export interface SpeechRecognitionHook {
   isSupported: boolean;
   isListening: boolean;
   isTranscribing: boolean;
+  micSignal: boolean;
   transcript: string;
   interimTranscript: string;
   error: string | null;
@@ -25,6 +26,7 @@ export function useSpeechRecognition({
   onFinalTranscript?: (text: string) => void;
 } = {}): SpeechRecognitionHook {
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [micSignal, setMicSignal] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -38,7 +40,8 @@ export function useSpeechRecognition({
   useEffect(() => {
     setIsSupported(RecordedVoiceInput.supported() || Boolean((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition));
     recordedRef.current = new RecordedVoiceInput({
-      onReady: () => {},
+      onReady: () => setMicSignal(false),
+      onSignal: setMicSignal,
       onSilence: () => {
         setIsListening(false);
         setError("No audio was captured. Tap the microphone and try again.");
@@ -71,6 +74,7 @@ export function useSpeechRecognition({
   }, []);
 
   const startListening = useCallback(() => {
+    setMicSignal(false);
     if (RecordedVoiceInput.supported()) {
       setError(null);
       setIsListening(true);
@@ -178,6 +182,7 @@ export function useSpeechRecognition({
     isSupported,
     isListening,
     isTranscribing,
+    micSignal,
     transcript,
     interimTranscript,
     error,
