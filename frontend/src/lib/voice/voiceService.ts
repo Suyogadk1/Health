@@ -7,6 +7,7 @@ export interface VoiceServiceCallbacks {
   onTranscript: (text: string) => void;
   onSpeakingStart: () => void;
   onSpeakingEnd: () => void;
+  onPlaybackError: (message: string) => void;
   onError: (message: string) => void;
   onSilence?: () => void;
   onListeningStart?: () => void;
@@ -195,6 +196,7 @@ export class VoiceService {
     recognition?.abort();
     this.finalText = "";
   }
+  preparePlayback() { aiVoiceService.prepareCallPlayback(); }
   speak(text: string) {
     this.stopListening();
     this.cancelSpeaking();
@@ -215,7 +217,7 @@ export class VoiceService {
         this.unsubscribe = undefined;
         this.playing = false;
         this.recording?.setPlayback(false);
-        if (evt.error) this.callbacks.onError(evt.error);
+        if (evt.error) this.callbacks.onPlaybackError(evt.error);
         else this.callbacks.onSpeakingEnd();
       }
     });

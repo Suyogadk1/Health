@@ -85,6 +85,11 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
       onRecovering: message => { if (callActive.current) { setError(message); transition("connecting"); } },
       onSpeakingStart: () => { if (callActive.current) transition("speaking"); },
       onSpeakingEnd: resumeListening,
+      onPlaybackError: message => {
+        if (!callActive.current) return;
+        setError(message);
+        resumeListening();
+      },
       onError: message => {
         if (!callActive.current) return;
         setError(message);
@@ -163,6 +168,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
     serviceRef.current?.setMuted(false);
     setMuted(false);
     serviceRef.current?.resetSession();
+    serviceRef.current?.preparePlayback();
     serviceRef.current?.setLanguage(settingsRef.current.language || "en-US");
     transition("connecting");
     setSeconds(0);

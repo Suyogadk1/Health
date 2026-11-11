@@ -110,6 +110,7 @@ export function chunkTextIntoSentences(text: string, maxChunkLen = 160): string[
 }
 
 class AIVoiceService {
+  private callAudio: HTMLAudioElement | null = null;
   private audio: HTMLAudioElement | null = null;
   private audioUrl: string | null = null;
   private speechRequest: AbortController | null = null;
@@ -237,6 +238,15 @@ class AIVoiceService {
    * Speaks the text aloud, chunked cleanly across sentences.
    * If already speaking this item, it will stop/toggle.
    */
+  public prepareCallPlayback() {
+    // Safari and other browsers may require the same element to be started by a tap.
+    const audio = this.callAudio ?? new Audio();
+    this.callAudio = audio;
+    const silence = "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+    audio.src = silence;
+    void audio.play().catch(() => {});
+  }
+
   public async speak(text: string, id: string = "default"): Promise<void> {
     if (!this.isSupported()) {
       this.emit({ state: "idle", activeId: null, error: "Speech synthesis not supported in this browser." });
@@ -267,7 +277,8 @@ class AIVoiceService {
       const blob = await response.blob();
       if (version !== this.speechVersion) return;
       this.audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(this.audioUrl);
+      const audio = id === "voice-client-call" && this.callAudio ? this.callAudio : new Audio();
+      audio.src = this.audioUrl;
       this.audio = audio;
       audio.volume = this.settings.volume ?? 1;
       audio.onended = () => { if (version === this.speechVersion) this.stop(); };
