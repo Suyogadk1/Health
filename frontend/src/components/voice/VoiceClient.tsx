@@ -304,6 +304,15 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
               Stop reply and speak
             </button>
           )}
+          {state === "listening" && !muted && (
+            <button
+              type="button"
+              onClick={() => serviceRef.current?.submitCurrentTurn()}
+              className="rounded-full border border-charcoal/15 bg-warm-white px-4 py-2 text-sm text-charcoal"
+            >
+              Done speaking
+            </button>
+          )}
           <VoiceControls muted={muted} onToggleMute={toggleMute} onEnd={endCall} />
         </div>
       )}

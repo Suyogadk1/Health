@@ -126,6 +126,7 @@ export class RecordedVoiceInput {
       };
       let heard = false;
       let voicedFrames = 0;
+      let speechPeak = 0;
       let lastSpeech = performance.now();
       let started = lastSpeech;
       let wasPlayback = this.playback;
@@ -198,7 +199,9 @@ export class RecordedVoiceInput {
         for (const value of samples) sum += value * value;
         const level = Math.sqrt(sum / samples.length);
         if (options.dictation) this.callbacks.onSignal?.(level > 0.002);
-        const active = level > (this.playback ? 0.008 : 0.003);
+        // Quiet background sound should not keep an already-detected turn open.
+        const endThreshold = Math.min(0.015, Math.max(0.003, speechPeak * 0.12));
+        const active = level > (this.playback ? 0.008 : heard ? endThreshold : 0.003);
         const now = performance.now();
         if (wasPlayback && !this.playback && !heard) { started = now; chunks = []; }
         wasPlayback = this.playback;
@@ -208,6 +211,7 @@ export class RecordedVoiceInput {
             heard = true;
             if (this.playback) { this.playback = false; this.onset?.(); }
           }
+          speechPeak = Math.max(level, speechPeak * 0.99);
           lastSpeech = now;
         } else voicedFrames = 0;
         // Nepali speakers may pause inside a phrase; preserve that context in one upload.

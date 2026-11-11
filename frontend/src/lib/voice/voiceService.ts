@@ -85,6 +85,11 @@ export class VoiceService {
     this.silencePrompted = false;
     this.callbacks.onTranscript(text);
   }
+  submitCurrentTurn() {
+    if (this.muted || this.playing) return;
+    if (this.recording?.isRunning()) this.recording.finish();
+    else this.finishTurn();
+  }
   startListening() {
     if (this.muted || this.recording?.isRunning()) return;
     if (RecordedVoiceInput.supported()) {
