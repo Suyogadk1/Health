@@ -6,6 +6,7 @@ import { RecordedVoiceInput } from "@/lib/voice/recordedVoiceInput";
 export interface SpeechRecognitionHook {
   isSupported: boolean;
   isListening: boolean;
+  isTranscribing: boolean;
   transcript: string;
   interimTranscript: string;
   error: string | null;
@@ -23,6 +24,7 @@ export function useSpeechRecognition({
   onTranscriptChange?: (text: string) => void;
   onFinalTranscript?: (text: string) => void;
 } = {}): SpeechRecognitionHook {
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -37,15 +39,22 @@ export function useSpeechRecognition({
     setIsSupported(RecordedVoiceInput.supported() || Boolean((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition));
     recordedRef.current = new RecordedVoiceInput({
       onReady: () => {},
-      onSilence: () => setIsListening(false),
-      onTranscribing: () => {},
+      onSilence: () => {
+        setIsListening(false);
+        setError("No audio was captured. Tap the microphone and try again.");
+      },
+      onTranscribing: () => {
+        setIsListening(false);
+        setIsTranscribing(true);
+      },
       onTranscript: text => {
+        setIsTranscribing(false);
         setTranscript(text);
         setIsListening(false);
         callbacksRef.current.onTranscriptChange?.(text);
         callbacksRef.current.onFinalTranscript?.(text);
       },
-      onError: message => { setIsListening(false); setError(message); },
+      onError: message => { setIsTranscribing(false); setIsListening(false); setError(message); },
     });
     return () => recordedRef.current?.stop();
   }, []);
@@ -65,7 +74,7 @@ export function useSpeechRecognition({
     if (RecordedVoiceInput.supported()) {
       setError(null);
       setIsListening(true);
-      void recordedRef.current?.start(language);
+      void recordedRef.current?.start(language, { dictation: true });
       return;
     }
     if (!isSupported) {
@@ -145,6 +154,7 @@ export function useSpeechRecognition({
 
   const resetTranscript = useCallback(() => {
     recordedRef.current?.reset();
+    setIsTranscribing(false);
     if (recognitionRef.current) {
       recognitionRef.current.onresult = null;
       recognitionRef.current.abort();
@@ -167,6 +177,7 @@ export function useSpeechRecognition({
   return {
     isSupported,
     isListening,
+    isTranscribing,
     transcript,
     interimTranscript,
     error,

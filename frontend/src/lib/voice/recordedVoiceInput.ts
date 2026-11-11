@@ -45,7 +45,7 @@ export class RecordedVoiceInput {
     void this.context?.close().catch(() => {});
     this.context = undefined;
   }
-  async start(language: string, options: { playback?: boolean; onSpeechStart?: () => void } = {}) {
+  async start(language: string, options: { playback?: boolean; onSpeechStart?: () => void; dictation?: boolean } = {}) {
     this.stop();
     const version = this.version;
     this.playback = !!options.playback;
@@ -70,7 +70,7 @@ export class RecordedVoiceInput {
         if (version !== this.version) return;
         chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
         // While the AI is speaking keep only a brief pre-roll, not its whole reply.
-        if (this.playback || !heard) {
+        if (this.playback || (!heard && !options.dictation)) {
           while (chunks.length > Math.ceil(context.sampleRate * 0.4 / 4096)) chunks.shift();
         }
       };
@@ -128,8 +128,8 @@ export class RecordedVoiceInput {
               this.nudged = false;
               this.callbacks.onTranscript(data.text.trim());
             } else {
-              // Silence or inaudible sound is not a user message.
-              void this.start(language);
+              if (options.dictation) this.callbacks.onError("No words were recognized. Check the selected language and try again.");
+              else void this.start(language, options);
             }
           } catch (err) {
             if (version === this.version) {
@@ -141,8 +141,8 @@ export class RecordedVoiceInput {
       };
       this.running = true;
       this.finishCapture = () => {
-        if (heard) submit();
-        else { this.stop(); this.callbacks.onReady(); }
+        if (heard || (options.dictation && chunks.length > 0)) submit();
+        else { this.stop(); this.callbacks.onSilence(); }
       };
       this.callbacks.onReady();
       this.interval = setInterval(() => {
@@ -163,8 +163,8 @@ export class RecordedVoiceInput {
           lastSpeech = now;
         } else voicedFrames = 0;
         // Nepali speakers may pause inside a phrase; preserve that context in one upload.
-        if (heard && (now - lastSpeech > (language.startsWith("ne") ? 1500 : 1000) || now - started > 120000)) submit();
-        else if (!this.playback && !heard && !this.nudged && now - started >= 5000) {
+        if ((heard && now - lastSpeech > (language.startsWith("ne") ? 1500 : 1000)) || now - started > 120000) submit();
+        else if (!options.dictation && !this.playback && !heard && !this.nudged && now - started >= 5000) {
           this.nudged = true;
           this.stop();
           this.callbacks.onSilence();

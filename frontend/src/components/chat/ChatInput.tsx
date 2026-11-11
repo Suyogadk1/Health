@@ -26,6 +26,7 @@ export function ChatInput({
   const {
     isSupported: speechSupported,
     isListening,
+    isTranscribing,
     interimTranscript,
     error: speechError,
     startListening,
@@ -51,6 +52,7 @@ export function ChatInput({
   }, []);
 
   function submit() {
+    if (isTranscribing) return;
     if (isListening) {
       stopListening();
     }
@@ -70,6 +72,7 @@ export function ChatInput({
   }
 
   function toggleMic() {
+    if (isTranscribing) return;
     if (isListening) {
       stopListening();
     } else {
@@ -81,6 +84,7 @@ export function ChatInput({
 
   return (
     <div className="relative flex flex-col gap-1.5">
+      {isTranscribing && <p role="status" className="text-xs">Transcribing your recording…</p>}
       {/* Active Speech Recognition Banner when Microphone is Listening */}
       {isListening && (
         <div className="flex items-center justify-between gap-2 rounded-xl bg-rose-50 border border-rose-200 px-3 py-1.5 text-xs text-rose-900 animate-fadeIn">
@@ -91,7 +95,7 @@ export function ChatInput({
             </span>
             <span className="font-medium">Listening to your voice…</span>
             <span className="text-[11px] text-rose-700/80 hidden sm:inline">
-              Speak naturally, then pause briefly to see your words.
+              Speak, then pause or tap Stop to transcribe.
             </span>
           </div>
 
