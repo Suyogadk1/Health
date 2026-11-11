@@ -22,3 +22,15 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/api/speak"
+  to = "/.netlify/functions/mindcare/api/speak"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/transcribe"
+  to = "/.netlify/functions/mindcare/api/transcribe"
+  status = 200
+  force = true

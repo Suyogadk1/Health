@@ -12,9 +12,9 @@ transcribeRouter.post("/", requireAuth, raw({ type: ["audio/*", "video/webm", "a
   if (!["en", "hi", "ta", "te", "ne"].includes(language)) return res.status(400).json({ error: "Unsupported language." });
   const mime = String(req.headers["content-type"] || "audio/webm").split(";")[0];
   // Audio-capable Gemini handles Nepali spelling substantially better in our test.
-  const geminiKey = process.env.GEMINI_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY_1 || process.env.GEMINI_API_KEY;
   if (language === "ne" && geminiKey && !geminiKey.includes("placeholder")) {
-    const model = process.env.NEPALI_TRANSCRIPTION_MODEL || process.env.GEMINI_MODEL || "gemini-3.6-flash";
+    const model = process.env.NEPALI_TRANSCRIPTION_MODEL || process.env.GEMINI_MODEL_1 || process.env.GEMINI_MODEL || "gemini-3.6-flash";
     try {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey },

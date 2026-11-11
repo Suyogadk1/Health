@@ -52,7 +52,7 @@ export class RecordedVoiceInput {
     this.onset = options.onSpeechStart;
     try {
       // Resume inside the Start-call user gesture, before awaiting permissions.
-      const context = new AudioContext({ sampleRate: 16000 });
+      const context = new AudioContext();
       this.context = context;
       await context.resume();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
@@ -75,16 +75,30 @@ export class RecordedVoiceInput {
         }
       };
       const wav = () => {
-        const length = chunks.reduce((n, c) => n + c.length, 0);
+        const sampleRate = 16000;
+        const ratio = context.sampleRate / sampleRate;
+        const captured = new Float32Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
+        let position = 0;
+        for (const chunk of chunks) {
+          captured.set(chunk, position);
+          position += chunk.length;
+        }
+        const length = Math.floor(captured.length / ratio);
         const buffer = new ArrayBuffer(44 + length * 2);
         const view = new DataView(buffer);
         const word = (offset: number, text: string) => { for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i)); };
         word(0, "RIFF"); view.setUint32(4, 36 + length * 2, true); word(8, "WAVE");
         word(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
-        view.setUint32(24, context.sampleRate, true); view.setUint32(28, context.sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+        view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
         word(36, "data"); view.setUint32(40, length * 2, true);
-        let offset = 44;
-        for (const chunk of chunks) for (const value of chunk) { view.setInt16(offset, Math.max(-1, Math.min(1, value)) * (value < 0 ? 32768 : 32767), true); offset += 2; }
+        for (let index = 0; index < length; index++) {
+          const start = Math.floor(index * ratio);
+          const end = Math.max(start + 1, Math.floor((index + 1) * ratio));
+          let sum = 0;
+          for (let sample = start; sample < end; sample++) sum += captured[sample];
+          const value = Math.max(-1, Math.min(1, sum / (end - start)));
+          view.setInt16(44 + index * 2, value * (value < 0 ? 32768 : 32767), true);
+        }
         return new Blob([buffer], { type: "audio/wav" });
       };
       let heard = false;
@@ -107,7 +121,7 @@ export class RecordedVoiceInput {
               method: "POST", headers: { "Content-Type": "audio/wav" },
               body: audio, signal: this.request.signal,
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
             if (version !== this.version) return;
             if (!res.ok) throw new Error(data.error || "Transcription failed.");
             if (typeof data.text === "string" && data.text.trim()) {
