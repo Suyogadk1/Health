@@ -3,13 +3,28 @@ import { spawn } from "child_process";
 import path from "path";
 import { requireAuth, AuthenticatedRequest } from "../middleware/auth";
 import { checkRateLimit } from "../lib/utils/rateLimit";
+import { EdgeTTS } from "@andresaya/edge-tts";
 
 export const speakRouter = Router();
-speakRouter.post("/", requireAuth, (req: AuthenticatedRequest, res) => {
+speakRouter.post("/", requireAuth, async (req: AuthenticatedRequest, res) => {
   const { text, language = "en-US" } = req.body || {};
   if (typeof text !== "string" || !text.trim() || text.length > 6000 || !["en-US", "hi-IN", "ta-IN", "te-IN", "ne-NP"].includes(language)) return res.status(400).json({ error: "Invalid speech request." });
   if (!checkRateLimit(`tts:${req.user!.id}`).allowed) return res.status(429).json({ error: "Please wait briefly before playing more speech." });
   res.setHeader("Cache-Control", "no-store");
+  if (process.env.NETLIFY === "true" || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const voices: Record<string, string> = { "en-US": "en-US-JennyNeural", "hi-IN": "hi-IN-SwaraNeural", "ta-IN": "ta-IN-PallaviNeural", "te-IN": "te-IN-ShrutiNeural", "ne-NP": "ne-NP-HemkalaNeural" };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 30000);
+    res.on("close", () => controller.abort());
+    try {
+      const speech = new EdgeTTS();
+      await speech.synthesize(text.trim(), voices[language], { rate: "-5%", signal: controller.signal, timeout: 25000 });
+      if (!res.destroyed) res.type("audio/mpeg").send(speech.toBuffer());
+    } catch {
+      if (!res.headersSent && !res.destroyed) res.status(502).json({ error: "Female voice generation is temporarily unavailable." });
+    } finally { clearTimeout(timer); }
+    return;
+  }
   const child = spawn(process.env.TTS_PYTHON || "python", [path.resolve(__dirname, "../../scripts/speak.py")], { windowsHide: true });
   const chunks: Buffer[] = [];
   let size = 0;

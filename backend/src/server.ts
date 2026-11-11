@@ -93,7 +93,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "test" && process.env.NETLIFY !== "true" && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
   app.listen(PORT, () => {
     console.log(`🌿 MindCare Backend running on http://localhost:${PORT}`);
     console.log(`   Health Check: http://localhost:${PORT}/api/health`);

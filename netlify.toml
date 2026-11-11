@@ -1,6 +1,6 @@
 [build]
   base = "frontend"
-  command = "npm run build"
+  command = "npm ci --prefix ../backend && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -8,6 +8,10 @@
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,GROK_MODEL,GEMINI_MODEL_1,GEMINI_MODEL_2,AI_STRATEGY,GITHUB_CLIENT_ID"
 
 # Security Headers for production
+[functions]
+  directory = "../backend/netlify/functions"
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/*"
   [headers.values]

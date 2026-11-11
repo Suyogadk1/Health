@@ -9,7 +9,7 @@ const nextConfig = {
     const backendUrl =
       process.env.BACKEND_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:5001";
+      (process.env.NETLIFY === "true" ? "/.netlify/functions/mindcare" : "http://localhost:5001");
     const base = backendUrl.replace(/\/$/, "");
 
     return [

@@ -136,6 +136,19 @@ Some evaluation modes use live providers or optional services; see `backend/eval
 
 **This repository currently targets local development and demonstrations.** The supplied authentication contains demo-token and guest shortcuts, and the default backend conversation adapter uses in-memory storage. Do not expose it publicly with sensitive conversations as-is.
 
-Before production use, replace demo authentication and identity shortcuts, enforce server-verified authorization, configure durable per-user storage, review CORS and rate limits, validate provider privacy requirements, and independently evaluate safety behavior. Existing Netlify configuration does not by itself host the long-running Express/Python voice backend; deploy that service separately and set `BACKEND_URL` accordingly.
+Before production use, replace demo authentication and identity shortcuts, enforce server-verified authorization, configure durable per-user storage, review CORS and rate limits, validate provider privacy requirements, and independently evaluate safety behavior. The Netlify Functions adapter hosts the API and uses Node.js for voice output, as described below.
 
 The app is not an emergency service. For urgent concerns, seek appropriate local human support rather than relying on generated responses.
+
+## Deploy on Netlify
+
+The repository includes a Netlify Functions adapter for the Express API. Netlify builds the Next.js frontend from `frontend/` and bundles the API from `backend/netlify/functions/mindcare.ts`.
+
+1. Import `Suyogadk1/Health` in Netlify and use the root `netlify.toml` configuration.
+2. Add server-side provider credentials in Netlify environment variables, available to both builds and functions. At minimum, configure `GEMINI_API_KEY` for conversation/Nepali recognition and `GROQ_API_KEY` (or a Groq-format `GROK_API_KEY`) for other-language transcription. Optional NVIDIA/provider model settings follow `backend/.env.example`.
+3. Leave `BACKEND_URL` and `NEXT_PUBLIC_API_URL` unset for the built-in Netlify API. The frontend automatically targets `/.netlify/functions/mindcare` during Netlify builds. To use a separately hosted API instead, set `BACKEND_URL` to its HTTPS URL.
+4. Deploy. Verify `/api/health`, a multi-turn chat, microphone transcription and reply playback on the live HTTPS URL.
+
+On Netlify, female speech uses the Node.js Edge TTS client, retaining the same five female voices; no Python runtime is required. Python remains the local standalone backend's default speech path.
+
+Netlify Functions have execution and payload limits. The present demo store and rate limiter are in-memory and may reset or vary between function instances. This adapter does not turn the demo authentication or storage into a production system; the deployment boundaries above still apply. Client hang-up cancels local requests/playback, but upstream work may continue briefly after a proxy disconnect.
