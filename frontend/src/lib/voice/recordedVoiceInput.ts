@@ -11,6 +11,7 @@ export class RecordedVoiceInput {
   private version = 0;
   private stream?: MediaStream;
   private context?: AudioContext;
+  private recorder?: MediaRecorder;
   private processor?: ScriptProcessorNode;
   private playback = false;
   private running = false;
@@ -38,6 +39,8 @@ export class RecordedVoiceInput {
     clearInterval(this.interval);
     this.interval = undefined;
     this.running = false;
+    if (this.recorder?.state === "recording") this.recorder.stop();
+    this.recorder = undefined;
     if (this.processor) { this.processor.onaudioprocess = null; this.processor.disconnect(); }
     this.processor = undefined;
     this.stream?.getTracks().forEach(track => track.stop());
@@ -61,25 +64,43 @@ export class RecordedVoiceInput {
       const analyser = context.createAnalyser();
       analyser.fftSize = 2048;
       context.createMediaStreamSource(stream).connect(analyser);
-      const processor = context.createScriptProcessor(4096, 1, 1);
-      this.processor = processor;
-      context.createMediaStreamSource(stream).connect(processor);
-      processor.connect(context.destination);
       let chunks: Float32Array[] = [];
-      processor.onaudioprocess = event => {
-        if (version !== this.version) return;
-        chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
-        // While the AI is speaking keep only a brief pre-roll, not its whole reply.
-        if (this.playback || (!heard && !options.dictation)) {
-          while (chunks.length > Math.ceil(context.sampleRate * 0.4 / 4096)) chunks.shift();
-        }
-      };
-      const wav = () => {
+      const nativeChunks: Blob[] = [];
+      const recorder = options.dictation && typeof MediaRecorder !== "undefined"
+        ? new MediaRecorder(stream)
+        : undefined;
+      let nativeAudio: Promise<Blob> | undefined;
+      if (recorder) {
+        this.recorder = recorder;
+        nativeAudio = new Promise(resolve => {
+          recorder.ondataavailable = event => {
+            if (event.data.size) nativeChunks.push(event.data);
+          };
+          recorder.onstop = () => resolve(new Blob(nativeChunks, { type: recorder.mimeType }));
+          recorder.onerror = () => resolve(new Blob());
+        });
+        recorder.start();
+      } else {
+        const processor = context.createScriptProcessor(4096, 1, 1);
+        this.processor = processor;
+        context.createMediaStreamSource(stream).connect(processor);
+        processor.connect(context.destination);
+
+        processor.onaudioprocess = event => {
+          if (version !== this.version) return;
+          chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+          // While the AI is speaking keep only a brief pre-roll, not its whole reply.
+          if (this.playback || (!heard && !options.dictation)) {
+            while (chunks.length > Math.ceil(context.sampleRate * 0.4 / 4096)) chunks.shift();
+          }
+        };
+      }
+      const wav = (capturedChunks: Float32Array[]) => {
         const sampleRate = 16000;
         const ratio = context.sampleRate / sampleRate;
-        const captured = new Float32Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
+        const captured = new Float32Array(capturedChunks.reduce((sum, chunk) => sum + chunk.length, 0));
         let position = 0;
-        for (const chunk of chunks) {
+        for (const chunk of capturedChunks) {
           captured.set(chunk, position);
           position += chunk.length;
         }
@@ -107,16 +128,30 @@ export class RecordedVoiceInput {
       let started = lastSpeech;
       let wasPlayback = this.playback;
       const samples = new Float32Array(analyser.fftSize);
+      let submitting = false;
       const submit = () => {
-        if (version !== this.version || !this.running) return;
+        if (version !== this.version || !this.running || submitting) return;
+        submitting = true;
         clearInterval(this.interval);
-        const audio = wav();
         void (async () => {
           if (version !== this.version) return;
-          this.release();
           this.callbacks.onTranscribing();
           this.request = new AbortController();
           try {
+            if (recorder?.state === "recording") recorder.stop();
+            const recording = await nativeAudio;
+            if (version !== this.version) return;
+            if (recording) {
+              if (!recording.size) throw new Error("No audio was captured. Check your browser’s microphone settings.");
+              const decoded = await context.decodeAudioData(await recording.arrayBuffer());
+              chunks = [decoded.getChannelData(0)];
+            }
+            if (version !== this.version) return;
+            if (options.dictation && !chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
+              throw new Error("The microphone recorded silence. Check that the correct microphone is selected and unmuted.");
+            }
+            const audio = wav(chunks);
+            this.release();
             const res = await fetch(`/api/transcribe?language=${encodeURIComponent(language)}`, {
               method: "POST", headers: { "Content-Type": "audio/wav" },
               body: audio, signal: this.request.signal,
@@ -141,7 +176,7 @@ export class RecordedVoiceInput {
       };
       this.running = true;
       this.finishCapture = () => {
-        if (heard || (options.dictation && chunks.length > 0)) submit();
+        if (heard || recorder || (options.dictation && chunks.length > 0)) submit();
         else { this.stop(); this.callbacks.onSilence(); }
       };
       this.callbacks.onReady();
