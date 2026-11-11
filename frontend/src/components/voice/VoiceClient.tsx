@@ -66,14 +66,14 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
     }
     promptedForSilence.current = true;
     const language = settingsRef.current.language || "en-US";
-    const prompts: Record<string, [string, string]> = {
-      "en-US": ["I'm here with you. What's on your mind today?", "Take your time. Would you like to tell me more about what you shared, or talk about what might help right now?"],
-      "hi-IN": ["मैं आपके साथ हूँ। आज आपके मन में क्या चल रहा है?", "आराम से बताइए। क्या आप अपनी बात के बारे में और बताना चाहेंगे, या बात करें कि अभी क्या मदद कर सकता है?"],
-      "ta-IN": ["நான் உங்களுடன் இருக்கிறேன். இன்று உங்கள் மனதில் என்ன இருக்கிறது?", "அவசரமில்லை. நீங்கள் பகிர்ந்ததைப் பற்றி மேலும் சொல்ல விரும்புகிறீர்களா, அல்லது இப்போது எது உதவும் என்று பேசலாமா?"],
-      "te-IN": ["నేను మీతోనే ఉన్నాను. ఈ రోజు మీ మనసులో ఏముంది?", "నెమ్మదిగా చెప్పండి. మీరు చెప్పిన విషయం గురించి మరింత చెప్పాలనుకుంటున్నారా, లేదా ఇప్పుడు ఏది సహాయపడుతుందో మాట్లాడుకుందామా?"],
-      "ne-NP": ["म तपाईंको साथमा छु। आज तपाईंको मनमा के चलिरहेको छ?", "बिस्तारै भन्नुहोस्। तपाईंले साझा गर्नुभएको कुराबारे थप भन्न चाहनुहुन्छ, वा अहिले के कुराले मद्दत गर्छ भनेर कुरा गरौँ?"],
+    const prompts: Record<string, string> = {
+      "en-US": "I'm here with you. What's on your mind today?",
+      "hi-IN": "मैं आपके साथ हूँ। आज आपके मन में क्या चल रहा है?",
+      "ta-IN": "நான் உங்களுடன் இருக்கிறேன். இன்று உங்கள் மனதில் என்ன இருக்கிறது?",
+      "te-IN": "నేను మీతోనే ఉన్నాను. ఈ రోజు మీ మనసులో ఏముంది?",
+      "ne-NP": "म तपाईंको साथमा छु। आज तपाईंको मनमा के चलिरहेको छ?",
     };
-    const prompt = (prompts[language] || prompts["en-US"])[0];
+    const prompt = prompts[language] || prompts["en-US"];
     serviceRef.current?.speak(prompt);
   }
 
@@ -81,7 +81,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
     const service = new VoiceService({
       onTranscript: handleTranscript,
       onSilence: handleSilence,
-      onListeningStart: () => { if (callActive.current && !busy.current) { setError(null); transition("listening"); } },
+      onListeningStart: () => { if (callActive.current && !busy.current) { transition("listening"); } },
       onRecovering: message => { if (callActive.current) { setError(message); transition("connecting"); } },
       onSpeakingStart: () => { if (callActive.current) transition("speaking"); },
       onSpeakingEnd: resumeListening,

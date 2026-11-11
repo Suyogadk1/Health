@@ -149,7 +149,7 @@ export class RecordedVoiceInput {
               chunks = [decoded.getChannelData(0)];
             }
             if (version !== this.version) return;
-            if (!chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
+            if (options.dictation && !chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
               throw new Error("The microphone recorded silence. Check that the correct microphone is selected and unmuted.");
             }
             const audio = wav(chunks);
