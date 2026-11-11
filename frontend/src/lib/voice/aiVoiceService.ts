@@ -50,6 +50,10 @@ export function cleanTextForSpeech(raw: string): string {
     // Remove bold and italics **text**, *text*, __text__, _text_
     .replace(/(\*\*|__)(.*?)\1/g, "$2")
     .replace(/(\*|_)(.*?)\1/g, "$2")
+    // Read the localized brand name once when its English spelling follows it.
+    .replace(/(^|[^\p{L}\p{M}\p{N}])(माइन्डकेयर|माइंडकेयर|माइन्ड केयर|माइंड केयर)\s*[（(]\s*Mind\s*Care\s*[）)]/giu, "$1$2")
+    // Keep meaningful asides, removing only a repeated spelling.
+    .replace(/(^|[^\p{L}\p{M}\p{N}])([\p{L}\p{M}\p{N}]+)\s*[（(]\s*\2\s*[）)]/giu, "$1$2")
     // Remove bullet points and numbered lists
     .replace(/^(\s*[-*+]|\s*\d+\.)\s+/gm, "")
     // Remove blockquotes >
