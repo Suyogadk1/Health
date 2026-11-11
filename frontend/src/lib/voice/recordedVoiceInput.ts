@@ -163,7 +163,7 @@ export class RecordedVoiceInput {
           lastSpeech = now;
         } else voicedFrames = 0;
         // Nepali speakers may pause inside a phrase; preserve that context in one upload.
-        if ((heard && now - lastSpeech > (language.startsWith("ne") ? 1500 : 1000)) || now - started > 120000) submit();
+        if ((!options.dictation && heard && now - lastSpeech > (language.startsWith("ne") ? 1500 : 1000)) || now - started > 120000) submit();
         else if (!options.dictation && !this.playback && !heard && !this.nudged && now - started >= 5000) {
           this.nudged = true;
           this.stop();

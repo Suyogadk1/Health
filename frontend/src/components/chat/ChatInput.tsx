@@ -95,7 +95,7 @@ export function ChatInput({
             </span>
             <span className="font-medium">Listening to your voice…</span>
             <span className="text-[11px] text-rose-700/80 hidden sm:inline">
-              Speak, then pause or tap Stop to transcribe.
+              Speak at your own pace, then tap Stop to transcribe.
             </span>
           </div>
 
