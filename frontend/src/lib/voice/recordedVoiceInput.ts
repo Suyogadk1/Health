@@ -68,7 +68,7 @@ export class RecordedVoiceInput {
       context.createMediaStreamSource(stream).connect(analyser);
       let chunks: Float32Array[] = [];
       const nativeChunks: Blob[] = [];
-      const recorder = options.dictation && typeof MediaRecorder !== "undefined"
+      const recorder = !options.playback && typeof MediaRecorder !== "undefined"
         ? new MediaRecorder(stream)
         : undefined;
       let nativeAudio: Promise<Blob> | undefined;
@@ -149,7 +149,13 @@ export class RecordedVoiceInput {
               chunks = [decoded.getChannelData(0)];
             }
             if (version !== this.version) return;
-            if (options.dictation && !chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
+            if ((options.dictation || recorder) && !chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
+              if (!options.dictation) {
+                this.release();
+                this.callbacks.onRecovering?.("No microphone sound was captured. Check your microphone and speak again.");
+                void this.start(language);
+                return;
+              }
               throw new Error("The microphone recorded silence. Check that the correct microphone is selected and unmuted.");
             }
             const audio = wav(chunks);
@@ -192,7 +198,7 @@ export class RecordedVoiceInput {
         for (const value of samples) sum += value * value;
         const level = Math.sqrt(sum / samples.length);
         if (options.dictation) this.callbacks.onSignal?.(level > 0.002);
-        const active = level > (this.playback ? 0.025 : 0.012);
+        const active = level > (this.playback ? 0.025 : 0.003);
         const now = performance.now();
         if (wasPlayback && !this.playback && !heard) { started = now; chunks = []; }
         wasPlayback = this.playback;
@@ -205,7 +211,7 @@ export class RecordedVoiceInput {
           lastSpeech = now;
         } else voicedFrames = 0;
         // Nepali speakers may pause inside a phrase; preserve that context in one upload.
-        if ((!options.dictation && heard && now - lastSpeech > (language.startsWith("ne") ? 1500 : 1000)) || now - started > 120000) submit();
+        if ((!options.dictation && heard && now - lastSpeech > (language.startsWith("ne") ? 1800 : 1500)) || now - started > 120000) submit();
         else if (!options.dictation && !this.playback && !heard && !this.nudged && now - started >= 5000) {
           this.nudged = true;
           this.stop();
