@@ -40,7 +40,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [lastReply, setLastReply] = useState<string | null>(null);
   const [lastTranscript, setLastTranscript] = useState("");
-  const lastTranscriptRef = useRef("");
+  const promptedForSilence = useRef(false);
   const serviceRef = useRef<VoiceService | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const requestRef = useRef<AbortController | null>(null);
@@ -60,6 +60,11 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
   }
   function handleSilence() {
     if (!callActive.current || busy.current || mutedRef.current) return;
+    if (promptedForSilence.current) {
+      resumeListening();
+      return;
+    }
+    promptedForSilence.current = true;
     const language = settingsRef.current.language || "en-US";
     const prompts: Record<string, [string, string]> = {
       "en-US": ["I'm here with you. What's on your mind today?", "Take your time. Would you like to tell me more about what you shared, or talk about what might help right now?"],
@@ -68,8 +73,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
       "te-IN": ["నేను మీతోనే ఉన్నాను. ఈ రోజు మీ మనసులో ఏముంది?", "నెమ్మదిగా చెప్పండి. మీరు చెప్పిన విషయం గురించి మరింత చెప్పాలనుకుంటున్నారా, లేదా ఇప్పుడు ఏది సహాయపడుతుందో మాట్లాడుకుందామా?"],
       "ne-NP": ["म तपाईंको साथमा छु। आज तपाईंको मनमा के चलिरहेको छ?", "बिस्तारै भन्नुहोस्। तपाईंले साझा गर्नुभएको कुराबारे थप भन्न चाहनुहुन्छ, वा अहिले के कुराले मद्दत गर्छ भनेर कुरा गरौँ?"],
     };
-    const prompt = (prompts[language] || prompts["en-US"])[lastTranscriptRef.current ? 1 : 0];
-    setLastReply(prompt);
+    const prompt = (prompts[language] || prompts["en-US"])[0];
     serviceRef.current?.speak(prompt);
   }
 
@@ -109,7 +113,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
     transition("thinking");
     setError(null);
     setLastTranscript(text);
-    lastTranscriptRef.current = text;
+    setLastReply(null);
     const controller = new AbortController();
     requestRef.current = controller;
     try {
@@ -152,7 +156,7 @@ export function VoiceClient({ isGuest = false }: { isGuest?: boolean }) {
     callVersion.current++;
     busy.current = false;
     conversationRef.current = crypto.randomUUID();
-    lastTranscriptRef.current = "";
+    promptedForSilence.current = false;
     setLastTranscript("");
     setLastReply(null);
     mutedRef.current = false;

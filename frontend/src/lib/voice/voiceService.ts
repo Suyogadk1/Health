@@ -51,6 +51,7 @@ export class VoiceService {
       onReady: () => { if (!this.playing) this.callbacks.onListeningStart?.(); },
       onSilence: () => this.callbacks.onSilence?.(),
       onTranscript: text => this.callbacks.onTranscript(text),
+      onRecovering: message => this.callbacks.onRecovering?.(message),
       onTranscribing: () => this.callbacks.onRecovering?.("Understanding your voice…"),
       onError: message => this.callbacks.onError(message),
     });

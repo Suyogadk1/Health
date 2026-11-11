@@ -1,5 +1,6 @@
 type Callbacks = {
   onReady: () => void;
+  onRecovering?: (message: string) => void;
   onSignal?: (detected: boolean) => void;
   onSilence: () => void;
   onTranscript: (text: string) => void;
@@ -92,7 +93,7 @@ export class RecordedVoiceInput {
           chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
           // While the AI is speaking keep only a brief pre-roll, not its whole reply.
           if (this.playback || (!heard && !options.dictation)) {
-            while (chunks.length > Math.ceil(context.sampleRate * 0.4 / 4096)) chunks.shift();
+            while (chunks.length > Math.ceil(context.sampleRate * 0.9 / 4096)) chunks.shift();
           }
         };
       }
@@ -148,7 +149,7 @@ export class RecordedVoiceInput {
               chunks = [decoded.getChannelData(0)];
             }
             if (version !== this.version) return;
-            if (options.dictation && !chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
+            if (!chunks.some(chunk => chunk.some(sample => Math.abs(sample) >= 0.001))) {
               throw new Error("The microphone recorded silence. Check that the correct microphone is selected and unmuted.");
             }
             const audio = wav(chunks);
@@ -165,7 +166,10 @@ export class RecordedVoiceInput {
               this.callbacks.onTranscript(data.text.trim());
             } else {
               if (options.dictation) this.callbacks.onError("No words were recognized. Check the selected language and try again.");
-              else void this.start(language, options);
+              else {
+                this.callbacks.onRecovering?.("No words were recognized. Please repeat your question.");
+                void this.start(language);
+              }
             }
           } catch (err) {
             if (version === this.version) {
