@@ -55,6 +55,7 @@ chatRouter.post("/", requireAuth, async (req: AuthenticatedRequest, res: Respons
       reply: r.reply,
       risk: r.isDangerous ? "high" : r.risk,
       safetyCoverage: r.safetyCoverage,
+      riskSource: r.riskSource,
       isDangerous: r.isDangerous,
       matchedSignals: r.matchedSignals,
       agentALevel: r.agentALevel,
