@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   History,
+  Download,
   Sparkles,
   Plus,
   X,
@@ -278,6 +279,7 @@ export function ChatWindow({
   }
 
   async function handleSend(text: string) {
+    const requestStart = performance.now();
     setError(null);
     const optimisticUser: Message = {
       id: `local-${Date.now()}`,
@@ -304,8 +306,9 @@ export function ChatWindow({
         body: JSON.stringify({ conversationId, message: text, language: voiceSettings.language || "en-US" }),
       });
 
-      if (!res.ok) throw new Error("request failed");
+      if (!res.ok) throw new Error(`Chat request failed (HTTP ${res.status}). Your message has not received a reply. Please export this chat before leaving.`);
       const data = await res.json();
+      if (typeof data.reply !== "string" || !data.reply.trim()) throw new Error("The server returned no reply. Please export this chat before leaving.");
 
       const assistantMsgId = `local-${Date.now()}-assistant`;
       setMessages((prev) => [
@@ -324,6 +327,13 @@ export function ChatWindow({
           agentALevel: data.agentALevel,
           agentBLevel: data.agentBLevel,
           overridden: data.overridden,
+          evaluation: {
+            model: data.model,
+            riskSource: data.riskSource,
+            safetyCoverage: data.safetyCoverage,
+            clientRoundTripMs: Math.round(performance.now() - requestStart),
+            stageTimings: data.stageTimings,
+          },
         },
       ]);
 
@@ -344,8 +354,8 @@ export function ChatWindow({
           if (d.data) setAllConversations(d.data);
         })
         .catch(() => {});
-    } catch {
-      setError("I'm having trouble connecting right now. Please try again in a moment.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Connection failed. Please export this chat before leaving.");
     } finally {
       setPending(false);
     }
@@ -436,6 +446,32 @@ export function ChatWindow({
               <Sliders size={14} />
             </button>
           )}
+
+          <button
+            disabled={pending || messages.length === 0}
+            onClick={() => {
+              const transcript = {
+                schemaVersion: 1,
+                conversationId,
+                exportedAt: new Date().toISOString(),
+                language: voiceSettings.language || "en-US",
+                scope: "Messages currently loaded in this browser; may not include the full conversation history",
+                error: error || null,
+                messages: messages.map(({ userId, ...message }) => message),
+              };
+              const url = URL.createObjectURL(new Blob([JSON.stringify(transcript, null, 2)], { type: "application/json" }));
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `mindcare-conversation-${Date.now()}.json`;
+              a.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }}
+            className="flex items-center gap-1 rounded-xl border border-charcoal/10 px-3 py-1.5 text-xs disabled:opacity-50"
+            title="Download the loaded conversation to your device. It may contain sensitive information."
+            aria-label="Export chat"
+          >
+            <Download size={14} /><span className="hidden sm:inline">Export chat</span>
+          </button>
 
           {/* Previous Chats Drawer Trigger */}
           <button
