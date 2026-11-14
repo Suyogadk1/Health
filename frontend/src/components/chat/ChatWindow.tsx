@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   History,
+  Download,
   Sparkles,
   Plus,
   X,
@@ -143,6 +144,16 @@ export function ChatWindow({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recordingRequired, setRecordingRequired] = useState(false);
+  const [recordingChecked, setRecordingChecked] = useState(false);
+  const [participantCode, setParticipantCode] = useState("");
+  const [evaluationConsent, setEvaluationConsent] = useState(false);
+  useEffect(() => {
+    fetch("/api/health").then(r => { if (!r.ok) throw new Error("health"); return r.json(); })
+      .then(d => { setRecordingRequired(Boolean(d.evaluationRecording)); setRecordingChecked(true); })
+      .catch(() => { setError("Cannot verify the backend configuration. Please retry before sending a message."); });
+  }, []);
+
 
   // Cross-chat interconnection states
   const [interconnectedChats, setInterconnectedChats] = useState<InterconnectedChat[]>([]);
@@ -278,6 +289,10 @@ export function ChatWindow({
   }
 
   async function handleSend(text: string) {
+    if (!recordingChecked || (recordingRequired && (!evaluationConsent || !/^[A-Za-z0-9_-]{1,40}$/.test(participantCode)))) {
+      setError("Enter your assigned participant code and confirm consent before evaluation messaging."); return;
+    }
+    const requestStart = performance.now();
     setError(null);
     const optimisticUser: Message = {
       id: `local-${Date.now()}`,
@@ -301,11 +316,12 @@ export function ChatWindow({
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.access_token || "demo-token"}`,
         },
-        body: JSON.stringify({ conversationId, message: text, language: voiceSettings.language || "en-US" }),
+        body: JSON.stringify({ conversationId, message: text, language: voiceSettings.language || "en-US", participantCode: participantCode || undefined, evaluationConsent }),
       });
 
-      if (!res.ok) throw new Error("request failed");
+      if (!res.ok) throw new Error(`Chat request failed (HTTP ${res.status}). Your message has not received a reply. Please export this chat before leaving.`);
       const data = await res.json();
+      if (typeof data.reply !== "string" || !data.reply.trim()) throw new Error("The server returned no reply. Please export this chat before leaving.");
 
       const assistantMsgId = `local-${Date.now()}-assistant`;
       setMessages((prev) => [
@@ -324,6 +340,18 @@ export function ChatWindow({
           agentALevel: data.agentALevel,
           agentBLevel: data.agentBLevel,
           overridden: data.overridden,
+          evaluation: {
+            model: data.model,
+            classifierTrace: data.classifierTrace,
+            reviewerTrace: data.reviewerTrace,
+            finalLatencyMs: data.finalLatencyMs,
+            configurationHash: data.configurationHash,
+            recordingId: data.recordingId,
+            riskSource: data.riskSource,
+            safetyCoverage: data.safetyCoverage,
+            clientRoundTripMs: Math.round(performance.now() - requestStart),
+            stageTimings: data.stageTimings,
+          },
         },
       ]);
 
@@ -344,8 +372,8 @@ export function ChatWindow({
           if (d.data) setAllConversations(d.data);
         })
         .catch(() => {});
-    } catch {
-      setError("I'm having trouble connecting right now. Please try again in a moment.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Connection failed. Please export this chat before leaving.");
     } finally {
       setPending(false);
     }
@@ -365,6 +393,12 @@ export function ChatWindow({
         <span>Choose a language, tap the microphone, then send. Enable Voice On to hear replies.</span>
         <span>Clear female narration in your selected language.</span>
       </label>
+      {recordingRequired && <div className="border-y border-charcoal/10 bg-amber-50 px-4 py-3 text-sm text-charcoal">
+        <p className="font-medium">Research session recording</p>
+        <p>With your consent, this computer saves messages, generated drafts, safety decisions and response timing for research. Configured external AI providers process the conversation. Avoid identifying details. Use a new chat and your assigned code for each participant.</p>
+        <label className="block mt-2">Participant code <input aria-label="Participant code" value={participantCode} onChange={e => setParticipantCode(e.target.value)} disabled={pending || messages.length > 0} placeholder="For example P06" className="rounded border p-1" /></label>
+        <label className="block mt-2"><input type="checkbox" checked={evaluationConsent} onChange={e => setEvaluationConsent(e.target.checked)} disabled={pending} /> I consent to saving this session and using its anonymized content for the study.</label>
+      </div>}
       {/* 1. Header with Interconnection & Previous Chats Button */}
       <div className="flex items-center justify-between border-b border-charcoal/[0.07] bg-white/80 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-3.5 z-10">
         <div className="flex items-center gap-2.5">
@@ -436,6 +470,34 @@ export function ChatWindow({
               <Sliders size={14} />
             </button>
           )}
+
+          <button
+            disabled={pending || messages.length === 0}
+            onClick={() => {
+              const transcript = {
+                schemaVersion: 1,
+                conversationId,
+                participantCode: recordingRequired ? participantCode : undefined,
+                consentConfirmed: recordingRequired ? evaluationConsent : undefined,
+                exportedAt: new Date().toISOString(),
+                language: voiceSettings.language || "en-US",
+                scope: "Messages currently loaded in this browser; may not include the full conversation history",
+                error: error || null,
+                messages: messages.map(({ userId, ...message }) => message),
+              };
+              const url = URL.createObjectURL(new Blob([JSON.stringify(transcript, null, 2)], { type: "application/json" }));
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `mindcare-conversation-${Date.now()}.json`;
+              a.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }}
+            className="flex items-center gap-1 rounded-xl border border-charcoal/10 px-3 py-1.5 text-xs disabled:opacity-50"
+            title="Download the loaded conversation to your device. It may contain sensitive information."
+            aria-label="Export chat"
+          >
+            <Download size={14} /><span className="hidden sm:inline">Export chat</span>
+          </button>
 
           {/* Previous Chats Drawer Trigger */}
           <button
@@ -583,7 +645,7 @@ export function ChatWindow({
                 key={idx}
                 type="button"
                 onClick={() => handleSend(sug.prompt)}
-                disabled={pending}
+                disabled={pending || !recordingChecked || (recordingRequired && (!evaluationConsent || !participantCode))}
                 className="inline-flex items-center gap-1.5 rounded-full border border-sage/50 bg-warm-white hover:bg-deep-sage hover:text-warm-white hover:border-deep-sage px-3 py-1 text-xs font-medium text-charcoal transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
                 title={`Ask: "${sug.prompt}"`}
               >
@@ -693,7 +755,7 @@ export function ChatWindow({
                       key={i}
                       type="button"
                       onClick={() => handleSend(sug.prompt)}
-                      disabled={pending}
+                      disabled={pending || !recordingChecked || (recordingRequired && (!evaluationConsent || !participantCode))}
                       className="flex w-full items-center justify-between rounded-lg bg-white/90 p-2 text-left text-xs font-medium text-charcoal hover:bg-white hover:text-deep-sage border border-charcoal/5 transition-all shadow-2xs"
                     >
                       <span>{sug.label}</span>
@@ -812,7 +874,7 @@ export function ChatWindow({
           language={voiceSettings.language || "en-US"}
           onVoiceStart={stop}
           onSend={handleSend}
-          disabled={pending}
+          disabled={pending || !recordingChecked || (recordingRequired && (!evaluationConsent || !participantCode))}
           autoSpeak={autoSpeak}
           onToggleAutoSpeak={toggleAutoSpeak}
         />

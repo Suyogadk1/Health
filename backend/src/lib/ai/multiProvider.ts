@@ -3,6 +3,7 @@ import { GeminiProvider } from "./geminiProvider";
 import { GrokProvider } from "./grokProvider";
 import { NemotronProvider } from "./nemotronProvider";
 import { MindfulProvider } from "./mindfulProvider";
+import { boundedCall } from "./boundedCall";
 
 export interface ProviderEntry {
   id: string;
@@ -35,7 +36,7 @@ export async function runProviderPool(
   for (const entry of pool) {
     attempts.push(entry.name);
     try {
-      const reply = await entry.provider.generate(messages, systemPrompt);
+      const reply = await boundedCall(entry.provider, messages, systemPrompt, 45000);
       if (reply && reply.trim().length > 0) {
         return { reply, provider: entry.name, model: entry.model, attempts };
       }
@@ -128,11 +129,11 @@ export class MultiAIProvider implements AIProvider {
         const grok = new GrokProvider({
           apiKey: grokKey,
           model: grokModel,
-          name: "Grok (xAI)",
+          name: grokKey!.startsWith("gsk_") ? "Groq Cloud" : "Grok (xAI)",
         });
         this.providers.push({
           id: "grok",
-          name: "Grok (xAI)",
+          name: grok.name,
           provider: grok,
           model: grokModel,
           isConfigured: true,
@@ -213,6 +214,9 @@ export class MultiAIProvider implements AIProvider {
     return runProviderPool(pool, messages, systemPrompt, this.fallback);
   }
 
+  /** In-process evaluation access; never expose provider objects through HTTP. */
+  getEvaluationProviders(): ProviderEntry[] { return [...this.getExecutionPool()]; }
+
   async generate(messages: ChatMessage[], systemPrompt: string): Promise<string> {
     const result = await this.generateWithDetails(messages, systemPrompt);
     return result.reply;
@@ -272,3 +276,4 @@ export class MultiAIProvider implements AIProvider {
     };
   }
 }
+

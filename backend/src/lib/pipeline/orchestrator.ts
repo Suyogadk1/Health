@@ -43,6 +43,7 @@ export async function runChatPipeline(
   let reply: string, provider: string, model: string | undefined, attempts: string[] | undefined;
   let agentALevel = emotion.risk.level, agentBLevel = emotion.risk.level, overridden = false;
   let sections: string[] = [], isDangerous = false;
+  let draftReply: string | undefined, reviewerTrace: ChatPipelineResult["reviewerTrace"];
 
   if (gate.shortCircuit) {
     timings.compose = 0;
@@ -53,7 +54,7 @@ export async function runChatPipeline(
       checkinContextText: memory.checkinContextText, crossChatContextText: memory.crossChatContextText, graphContextText: graph.graphContextText,
       emotionLabel: emotion.emotionLabel, generate: deps.generate, reviewer: deps.reviewer,
     }));
-    ({ reply, provider, model, attempts } = c);
+    ({ reply, provider, model, attempts, draftReply, reviewerTrace } = c);
     agentALevel = c.agentALevel; agentBLevel = c.agentBLevel; overridden = c.overridden; sections = c.systemPromptSections; isDangerous = c.isDangerous;
   }
 
@@ -68,6 +69,7 @@ export async function runChatPipeline(
   });
 
   return {
+    classifierTrace: emotion.classifierTrace, draftReply, reviewerTrace,
     conversationId: intake.conversationId, reply, risk: gate.level, riskSource: emotion.riskSource, safetyCoverage: emotion.safetyCoverage,
     emotionLabel: emotion.emotionLabel, provider, model, attempts, agentALevel, agentBLevel, overridden,
     graphTopics: graph.matchedTopics, contextSections: sections, isDangerous,

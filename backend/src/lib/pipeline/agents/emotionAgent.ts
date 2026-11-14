@@ -35,6 +35,7 @@ export async function emotionAgent(input: EmotionInput): Promise<EmotionOutput> 
   return {
     risk: { level: risk.level, matchedSignals: risk.matchedSignals },
     riskSource: risk.source,
+    classifierTrace: hybrid.classifierTrace,
     safetyCoverage,
     emotionLabel: best,
     emotionIntensity: Number(intensity.toFixed(2)),

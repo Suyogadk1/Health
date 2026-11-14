@@ -12,7 +12,7 @@ const nextConfig = {
       (process.env.NETLIFY === "true" ? "/.netlify/functions/mindcare" : "http://localhost:5001");
     const base = backendUrl.replace(/\/$/, "");
 
-    return [
+    return { beforeFiles: [
       { source: "/api/transcribe", destination: `${base}/api/transcribe` },
       { source: "/api/speak", destination: `${base}/api/speak` },
       {
@@ -51,7 +51,7 @@ const nextConfig = {
         source: "/api/health",
         destination: `${base}/api/health`,
       },
-    ];
+    ] };
   },
 };
 

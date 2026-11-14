@@ -1,9 +1,11 @@
+> CAMERA-READY AUDIT: Historical exploratory evidence only. These developer-authored sets do not independently validate a frozen final hybrid system. Version labels and counts conflict across archived reports; consult original traces. Current-configuration real-output ablation, external ratings, and failure-stratified final-response timing are pending. See `backend/eval/CAMERA_READY.md`.
+
 # MindCare: Comprehensive Evaluation Metrics & Results Report
 
 > **Project:** MindCare (Understory) AI Companion  
 > **Evaluation Suite:** `backend/eval/`  
 > **Harness Mode:** Deterministic Offline / Fault-Injection / Live LLM / Automated Evaluation  
-> **Status:** Fully Evaluated Across All Datasets & Pipelines
+> **Status:** Historical exploratory evaluations; camera-ready evidence requirements remain open
 
 ---
 
@@ -31,7 +33,7 @@ Agent A evaluates user input before any LLM generation occurs. High-risk inputs 
 | **Hybrid (Rules+LLM) Accuracy** | **94.25%** (164/174) | **89.83%** (53/59) | **96.72%** (59/61) | **93.62%** (44/47) |
 | **Hybrid High-Risk Miss Rate** | **1.39%** (1/72) | **0.00%** (0/22)* | **0.00%** (0/24) | **0.00%** (0/20) |
 | **Hybrid High-Risk Recall** | **98.61%** (71/72) | **100.0%** (22/22) | **100.0%** (24/24) | **100.0%** (20/20) |
-| **Corpus Nature** | In-sample development | Held-out challenge | Contaminated post-hoc | **Completely blind holdout** |
+| **Corpus Nature** | In-sample development | Held-out challenge | Contaminated post-hoc | Author-constructed additional set; independence unestablished |
 
 ---
 
@@ -90,7 +92,7 @@ Agent A evaluates user input before any LLM generation occurs. High-risk inputs 
 | **Overall / Macro** | **47** | **0.78** | **0.43** | **0.34** | **Accuracy: 40.4%** |
 
 - **High-Risk Miss Rate:** **95.0%** (19 / 20 missed).
-- **Key Empirical Finding:** Deterministic regex/heuristic rules cannot generalize to unseen metaphorical, colloquial, and indirect phrasings. This proves that an LLM-assisted hybrid tier (`assessRiskHybrid`) is an architectural necessity for clinical safety guarantees.
+- **Key Empirical Finding:** Deterministic regex/heuristic rules cannot generalize to unseen metaphorical, colloquial, and indirect phrasings. This is a limitation finding for the tested rules. It supplies no clinical safety guarantee or independent validation of the hybrid tier.
 
 ---
 

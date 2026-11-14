@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { evaluationEnabled } from "./lib/pipeline/evaluationRecorder";
 dotenv.config();
 
 import express from "express";
@@ -62,6 +63,7 @@ app.get("/", (_req, res) => {
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",
+    evaluationRecording: evaluationEnabled(),
     timestamp: new Date().toISOString(),
     aiConfigured: Boolean(
       process.env.GEMINI_API_KEY ||

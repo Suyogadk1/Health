@@ -34,6 +34,18 @@ export interface Message {
   agentALevel?: RiskLevel;
   agentBLevel?: RiskLevel;
   overridden?: boolean;
+  evaluation?: {
+    model?: string;
+    classifierTrace?: { status: string; elapsedMs: number; errorCategory?: string };
+    reviewerTrace?: { status: string; elapsedMs: number; errorCategory?: string };
+    finalLatencyMs?: number;
+    configurationHash?: string;
+    recordingId?: string;
+    riskSource?: string;
+    safetyCoverage?: string;
+    clientRoundTripMs: number;
+    stageTimings?: Record<string, number>;
+  };
 }
 
 export interface WellbeingCheckin {

@@ -1,6 +1,6 @@
 import type { CheckinRow } from "../wellbeing/checkinContext";
 import type { AIProvider, ChatMessage, GenerationResult } from "../ai/provider";
-import type { RiskAssessment, RiskLevel } from "../safety/safetyTypes";
+import type { RiskAssessment, RiskLevel, ClassifierTrace } from "../safety/safetyTypes";
 
 /**
  * Typed contracts for the 7-agent chat pipeline:
@@ -63,6 +63,7 @@ export interface EmotionInput { message: string; classifier?: AIProvider; previo
 export interface EmotionOutput {
   risk: RiskAssessment;
   riskSource: string;
+  classifierTrace?: ClassifierTrace;
   /** "full" = LLM tier was available for this message; "limited" = rules only (no/failed classifier). */
   safetyCoverage: "full" | "limited";
   emotionLabel: EmotionLabel;
@@ -114,6 +115,9 @@ export interface ResponseComposerOutput {
   agentBLevel: RiskLevel;
   overridden: boolean;
   isDangerous: boolean; // output-side risk check fired
+  draftReply?: string;
+  reviewDecision?: { overridden: boolean; finalReply: string; agentBLevel: RiskLevel };
+  reviewerTrace?: { status: string; elapsedMs: number; errorCategory?: string };
 }
 
 // 7. Insight / Reflection
@@ -139,6 +143,7 @@ export interface ChatPipelineResult {
   reply: string;
   risk: RiskLevel;
   riskSource: string;
+  classifierTrace?: ClassifierTrace;
   safetyCoverage: "full" | "limited";
   emotionLabel: EmotionLabel;
   provider: string;
@@ -150,6 +155,8 @@ export interface ChatPipelineResult {
   graphTopics: string[];
   contextSections: string[];
   isDangerous: boolean;
+  draftReply?: string;
+  reviewerTrace?: { status: string; elapsedMs: number; errorCategory?: string };
   interconnectedChats: { id: string; title: string; relativeTime: string }[];
   matchedSignals: string[];
   reflection: InsightReflectionOutput;
