@@ -41,6 +41,10 @@ Core final latency measures pipeline work until the final reply is ready, before
 - `backend/eval/capture_camera_ready.ts` and `camera_ready_report.py`: per-case capture and subgroup/failure reporting for their documented manifest/schema.
 - `backend/eval/compare_human_ratings.py`: pre-adjudication agreement and Cohen's kappa for two completed human rating files.
 - `backend/eval/test_safety_traces.ts`: classifier/reviewer trace, fallback and cancellation checks without live provider calls.
+- `tools/evaluation/import_frozen_conversation.py EXPORT.json`: validate consent, source hashes and the exported segment against private local server logs, preserving received versions. Handles continuation exports without counting them as new participants.
+- `tools/evaluation/prepare_ablation_rating_packets.py`: create separate blank, blinded HTML packets from `recordings/final-evaluation/ablation-results.jsonl`. Generated HTML embeds private content and stays ignored.
+- `tools/evaluation/analyze_ablation_ratings.py A.json B.json`: validate independently completed output ratings, calculate agreement and agreed-label outcomes, and export disagreements for human adjudication.
+- `tools/evaluation/run_full_pipeline_replay.ts`: run actual nominal/injected-classifier-failure replays from private `recordings/final-evaluation/replay-cases.jsonl` and its configuration manifest. Invoke with the backend's `tsx` from the backend working directory; it makes live provider calls and refuses to overwrite output.
 
 New independently authored conversations and independent human labels must be collected after the chosen freeze. Preserve original ratings and adjudication history. Do not generate labels and attribute them to an independent person. Use a preselected target per conversation or account for clustering; do not treat related turns or duplicated gate branches as independent trials. Report empty denominators as unavailable and explain assumptions behind confidence intervals.
 
