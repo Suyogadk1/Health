@@ -22,7 +22,7 @@ export class GeminiProvider implements AIProvider {
     this.name = options?.name || "Gemini";
   }
 
-  async generate(messages: ChatMessage[], systemPrompt: string): Promise<string> {
+  async generate(messages: ChatMessage[], systemPrompt: string, options?: { signal?: AbortSignal }): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
     const contents = messages.map((m) => ({
@@ -31,6 +31,7 @@ export class GeminiProvider implements AIProvider {
     }));
 
     const res = await fetch(url, {
+      signal: options?.signal,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
