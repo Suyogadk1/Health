@@ -5,7 +5,7 @@ export interface ChatMessage {
 
 export interface AIProvider {
   name: string;
-  generate(messages: ChatMessage[], systemPrompt: string): Promise<string>;
+  generate(messages: ChatMessage[], systemPrompt: string, options?: { signal?: AbortSignal }): Promise<string>;
 }
 
 export interface GenerationResult {

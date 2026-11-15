@@ -133,7 +133,7 @@ export async function runScenario(
     description: scenario.description,
     finalProvider: result.provider,
     finalModel: result.model,
-    attempts: result.attempts,
+    attempts: result.attempts ?? [],
     latencyMs,
     reply: result.reply,
   };

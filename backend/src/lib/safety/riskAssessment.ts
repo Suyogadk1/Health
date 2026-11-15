@@ -187,7 +187,8 @@ export function assessRisk(text: string): RiskAssessment {
 // does not flag as high. The final level is the MORE severe of the two, and
 // any classifier failure falls back to the regex result (never lowers risk).
 import type { AIProvider } from "../ai/provider";
-import type { RiskLevel } from "./safetyTypes";
+import type { RiskLevel, ClassifierTrace } from "./safetyTypes";
+import { boundedCall, failureCategory } from "../ai/boundedCall";
 
 const CLASSIFIER_PROMPT = `You classify the emotional-risk level of a message sent to a mental-wellbeing chat app. Users write English, Hindi, or Hinglish (Hindi in Roman script), often indirectly.
 Respond with strict JSON only: {"level":"none"|"moderate"|"high","reasoning":"one short sentence"}
@@ -202,23 +203,22 @@ const ORDER: Record<RiskLevel, number> = { none: 0, moderate: 1, high: 2 };
 export async function assessRiskHybrid(
   text: string,
   classifier?: AIProvider,
-  timeoutMs = 4000
-): Promise<RiskAssessment & { source: "regex" | "llm" | "regex+llm-failed" }> {
+  timeoutMs = 30000
+): Promise<RiskAssessment & { source: "regex" | "llm" | "regex+llm-failed"; classifierTrace: ClassifierTrace }> {
   const regex = assessRisk(text);
-  if (regex.level === "high" || !classifier) return { ...regex, source: "regex" };
+  if (regex.level === "high" || !classifier) return { ...regex, source: "regex", classifierTrace: { status: "not_called", elapsedMs: 0, bypassReason: regex.level === "high" ? "rules_high" : "not_configured" } };
+  const started = performance.now();
 
   try {
-    const call = classifier.generate([{ role: "user", content: text }], CLASSIFIER_PROMPT);
-    const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error("classifier timeout")), timeoutMs));
-    const raw = await Promise.race([call, timeout]);
+    const raw = await boundedCall(classifier, [{ role: "user", content: text }], CLASSIFIER_PROMPT, timeoutMs);
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     // Fail closed: an unrecognised level is treated as moderate, never as "none".
     const llmLevel: RiskLevel = ["none", "moderate", "high"].includes(parsed.level) ? parsed.level : "moderate";
     if (ORDER[llmLevel] > ORDER[regex.level]) {
-      return { level: llmLevel, matchedSignals: [...regex.matchedSignals, `llm:${String(parsed.reasoning || "").slice(0, 80)}`], source: "llm" };
+      return { level: llmLevel, matchedSignals: [...regex.matchedSignals, `llm:${String(parsed.reasoning || "").slice(0, 80)}`], source: "llm", classifierTrace: { status: "success", elapsedMs: Math.round(performance.now() - started), invalidLevel: !["none", "moderate", "high"].includes(parsed.level) } };
     }
-    return { ...regex, source: "regex" };
-  } catch {
-    return { ...regex, source: "regex+llm-failed" };
+    return { ...regex, source: "regex", classifierTrace: { status: "success", elapsedMs: Math.round(performance.now() - started), invalidLevel: !["none", "moderate", "high"].includes(parsed.level) } };
+  } catch (error) {
+    return { ...regex, source: "regex+llm-failed", classifierTrace: { status: "fallback", elapsedMs: Math.round(performance.now() - started), errorCategory: failureCategory(error) } };
   }
 }

@@ -23,6 +23,20 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Route these endpoints before Next's local API handlers. The standalone
+# backend owns the seven-agent hybrid pipeline used by this deployment.
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/mindcare/api/chat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/mindcare/api/health"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/api/speak"
   to = "/.netlify/functions/mindcare/api/speak"

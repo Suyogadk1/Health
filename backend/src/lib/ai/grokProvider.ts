@@ -30,12 +30,13 @@ export class GrokProvider implements AIProvider {
     }
   }
 
-  async generate(messages: ChatMessage[], systemPrompt: string): Promise<string> {
+  async generate(messages: ChatMessage[], systemPrompt: string, options?: { signal?: AbortSignal }): Promise<string> {
     const endpoint = this.isGroqCloud
       ? "https://api.groq.com/openai/v1/chat/completions"
       : "https://api.x.ai/v1/chat/completions";
 
     const res = await fetch(endpoint, {
+      signal: options?.signal,
       method: "POST",
       headers: {
         "Content-Type": "application/json",

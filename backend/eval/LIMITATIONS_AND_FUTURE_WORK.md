@@ -1,3 +1,5 @@
+> CAMERA-READY AUDIT: Historical exploratory evidence only. These developer-authored sets do not independently validate a frozen final hybrid system. Version labels and counts conflict across archived reports; consult original traces. Current-configuration real-output ablation, external ratings, and failure-stratified final-response timing are pending. See `backend/eval/CAMERA_READY.md`.
+
 # Limitations (Section VI) — status and future work
 
 Each limitation, what was done in this repo, what is still open. "Done" means

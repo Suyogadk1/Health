@@ -20,13 +20,14 @@ export class NemotronProvider implements AIProvider {
     this.name = options?.name || "NVIDIA Nemotron (NIM)";
   }
 
-  async generate(messages: ChatMessage[], systemPrompt: string): Promise<string> {
+  async generate(messages: ChatMessage[], systemPrompt: string, options?: { signal?: AbortSignal }): Promise<string> {
     if (!this.apiKey || this.apiKey.includes("placeholder")) {
       throw new Error(`NVIDIA API key is not configured for ${this.name}`);
     }
     const endpoint = "https://integrate.api.nvidia.com/v1/chat/completions";
 
     const res = await fetch(endpoint, {
+      signal: options?.signal,
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+import { boundedCall, failureCategory } from "../ai/boundedCall";
 import { assessRisk } from "./riskAssessment";
 import type { RiskAssessment, RiskLevel } from "./safetyTypes";
 import type { AIProvider, ChatMessage } from "../ai/provider";
@@ -25,6 +26,7 @@ export interface SafetyDecision {
   overridden: boolean;
   finalReply: string;
   latencyMs: number;
+  reviewerTrace?: { status: string; elapsedMs: number; errorCategory?: string };
 }
 
 const SAFETY_REVIEW_SYSTEM_PROMPT = `You are a safety reviewer for a mental-wellbeing chat app.
@@ -87,8 +89,9 @@ function heuristicReviewDraft(userMessage: string, draftReply: string): SafetyDe
 async function llmReviewDraft(
   reviewer: AIProvider,
   userMessage: string,
-  draftReply: string
-): Promise<{ level: RiskLevel; reasoning?: string }> {
+  draftReply: string,
+  timeoutMs: number
+): Promise<{ level: RiskLevel; reasoning?: string; invalidResponse?: boolean }> {
   const messages: ChatMessage[] = [
     {
       role: "user",
@@ -96,17 +99,17 @@ async function llmReviewDraft(
     },
   ];
 
-  const raw = await reviewer.generate(messages, SAFETY_REVIEW_SYSTEM_PROMPT);
+  const raw = await boundedCall(reviewer, messages, SAFETY_REVIEW_SYSTEM_PROMPT, timeoutMs);
 
   try {
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(cleaned);
-    const level: RiskLevel = ["none", "moderate", "high"].includes(parsed.level) ? parsed.level : "none";
-    return { level, reasoning: parsed.reasoning };
+    const level: RiskLevel = ["none", "moderate", "high"].includes(parsed.level) ? parsed.level : "moderate";
+    return { level, reasoning: parsed.reasoning, invalidResponse: !["none", "moderate", "high"].includes(parsed.level) };
   } catch {
     // If the reviewer didn't return valid JSON, fail closed to "moderate"
     // rather than silently treating a parse failure as "safe".
-    return { level: "moderate", reasoning: "unparseable reviewer output - failed closed" };
+    return { level: "moderate", reasoning: "unparseable reviewer output - failed closed", invalidResponse: true };
   }
 }
 
@@ -130,18 +133,18 @@ export async function reviewAndFinalize(
 
   let agentBLevel: RiskLevel;
   let agentBReasoning: string | undefined;
+  let reviewStatus = "not_configured";
+  let reviewError: string | undefined;
 
   if (options.reviewerProvider) {
     try {
-      const timeoutMs = options.timeoutMs ?? 12000;
-      const reviewPromise = llmReviewDraft(options.reviewerProvider, userMessage, draftReply);
-      const timeoutPromise = new Promise<{ level: RiskLevel; reasoning?: string }>((_, reject) =>
-        setTimeout(() => reject(new Error("Reviewer timed out")), timeoutMs)
-      );
-      const result = await Promise.race([reviewPromise, timeoutPromise]);
+      const result = await llmReviewDraft(options.reviewerProvider, userMessage, draftReply, options.timeoutMs ?? 12000);
+      reviewStatus = result.invalidResponse ? "invalid_response" : "success";
       agentBLevel = result.level;
       agentBReasoning = result.reasoning;
     } catch (err: any) {
+      reviewStatus = "fallback";
+      reviewError = failureCategory(err);
       // Provider failure or timeout -> fallback to fast heuristic reviewer
       agentBLevel = heuristicReviewDraft(userMessage, draftReply);
       agentBReasoning = `LLM reviewer fallback (${err?.message || err}); used heuristic review`;
@@ -165,5 +168,6 @@ export async function reviewAndFinalize(
     overridden,
     finalReply,
     latencyMs: Date.now() - start,
+    reviewerTrace: { status: reviewStatus, elapsedMs: Date.now() - start, errorCategory: reviewError },
   };
 }

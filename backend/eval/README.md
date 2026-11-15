@@ -1,3 +1,5 @@
+> CAMERA-READY AUDIT: Historical exploratory evidence only. These developer-authored sets do not independently validate a frozen final hybrid system. Version labels and counts conflict across archived reports; consult original traces. Current-configuration real-output ablation, external ratings, and failure-stratified final-response timing are pending. See `backend/eval/CAMERA_READY.md`.
+
 # Evaluation Harness
 
 Limitations/future-work status: `LIMITATIONS_AND_FUTURE_WORK.md`.
@@ -29,7 +31,7 @@ third-party and figurative-language handling) and evaluated on two sets:
 | locked v1 (colloquial, 61) | 61 | N/A | 21/24 (87.5%) | 91.8% | 3/24 (12.5%) | 96.7% | 0/24 (0.0%) |
 | locked2 (gold blind, 47) | 47 | N/A | 19/20 (95.0%) | 40.4% | 19/20 (95.0%) | **93.6%** | **0/20 (0.0%)** |
 
-**Empirical Live Finding:** As demonstrated above, deterministic regex rules collapsed on out-of-distribution phrasings (95.0% crisis miss rate on the blind holdout set `locked2`). In contrast, the hybrid tier (`assessRiskHybrid` with Nemotron Ultra) achieved **93.6% accuracy and 100% high-risk recall (0.0% miss rate, 20/20 caught)**, establishing that LLM-assisted defense-in-depth is essential for real-world safety generalization.
+**Empirical Live Finding:** As demonstrated above, deterministic regex rules collapsed on out-of-distribution phrasings (95.0% crisis miss rate on the blind holdout set `locked2`). In contrast, the hybrid tier (`assessRiskHybrid` with Nemotron Ultra) achieved **93.6% accuracy and 100% high-risk recall (0.0% miss rate, 20/20 caught)**, providing exploratory evidence that requires independent testing before any generalization claim.
 
 **Label provenance:** the 174 cases are synthetic and were reviewed by a single
 reviewer (2 corrections, 7 borderline flags). This is not inter-rater

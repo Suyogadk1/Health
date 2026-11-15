@@ -21,6 +21,9 @@ venv/
 
 # Local recordings and scratch files
 recordings/
+revision/
+eval-private/
+backend/eval/camera_ready_freeze.json
 work/
 outputs/
 .DS_Store

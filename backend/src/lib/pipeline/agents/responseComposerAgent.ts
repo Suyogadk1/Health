@@ -49,6 +49,7 @@ export async function responseComposerAgent(input: ResponseComposerInput): Promi
 
   return {
     reply, provider: result.provider, model: result.model, attempts: result.attempts,
+    draftReply: result.reply, reviewerTrace: decision.reviewerTrace, reviewDecision: decision,
     systemPromptSections: sections,
     agentALevel: decision.agentALevel, agentBLevel: decision.agentBLevel, overridden: decision.overridden, isDangerous,
   };
